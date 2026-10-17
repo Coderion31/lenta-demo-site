@@ -136,21 +136,21 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 .search {
   position: relative;
   flex: 1 1 auto;
-  max-width: 520px;
+  max-width: 580px;
   margin: 0 auto;
 }
 .search__icon {
-  position: absolute; left: 13px; top: 50%; transform: translateY(-50%);
-  width: 18px; height: 18px; color: var(--muted); pointer-events: none;
+  position: absolute; left: 15px; top: 50%; transform: translateY(-50%);
+  width: 19px; height: 19px; color: var(--muted); pointer-events: none;
 }
 .search input {
   width: 100%;
-  height: 40px;
-  border: 1px solid transparent;
-  border-radius: 999px;
+  height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
   background: var(--surface-2);
   color: var(--ink);
-  padding: 0 42px 0 40px;
+  padding: 0 46px 0 44px;
   font: inherit;
   transition: background .16s ease, border-color .16s ease, box-shadow .16s ease;
 }
@@ -163,7 +163,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
   box-shadow: 0 0 0 4px var(--accent-soft);
 }
 .search__clear {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
   width: 26px; height: 26px; display: grid; place-items: center;
   border: 0; border-radius: 50%; background: var(--line); cursor: pointer;
   color: var(--ink-2);
@@ -202,42 +202,6 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
   display: grid; place-items: center;
 }
 
-/* ---------- tabs ---------- */
-
-.tabs {
-  border-top: 1px solid transparent;
-}
-.tabs__inner {
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.tabs__inner::-webkit-scrollbar { display: none; }
-
-.tab {
-  flex: none;
-  position: relative;
-  border: 0; background: none;
-  padding: 11px 12px 13px;
-  font-size: 14px; font-weight: 550;
-  color: var(--muted);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color .15s ease;
-}
-.tab:hover { color: var(--ink); }
-.tab[aria-selected="true"] { color: var(--ink); }
-.tab[aria-selected="true"]::after {
-  content: "";
-  position: absolute; left: 12px; right: 12px; bottom: 3px;
-  height: 2px; border-radius: 2px;
-  background: var(--ink);
-}
-
 /* ---------- layout ---------- */
 
 .layout {
@@ -252,7 +216,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 
 .side {
   position: sticky;
-  top: calc(var(--header-h) + 60px);
+  top: calc(var(--header-h) + 26px);
   display: flex; flex-direction: column; gap: 22px;
 }
 
@@ -445,14 +409,14 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 .card--hero .card__body {
   display: grid;
   grid-template-columns: 1.12fr 1fr;
-  min-height: 306px;
+  min-height: 232px;
 }
-.card--hero .card__cover { height: 100%; min-height: 230px; }
-.card--hero .card__inner { padding: 24px 26px 20px; gap: 12px; justify-content: center; }
-.card--hero .card__title { font-size: 26px; letter-spacing: -.03em; line-height: 1.2; }
-.card--hero .card__open { -webkit-line-clamp: 3; }
-.card--hero .card__text { font-size: 14.5px; -webkit-line-clamp: 3; }
-.card--hero .card__foot { margin-top: auto; padding-top: 14px; }
+.card--hero .card__cover { height: 100%; min-height: 168px; }
+.card--hero .card__inner { padding: 16px 22px 14px; gap: 8px; justify-content: center; }
+.card--hero .card__title { font-size: 23px; letter-spacing: -.03em; line-height: 1.2; }
+.card--hero .card__open { -webkit-line-clamp: 2; }
+.card--hero .card__text { font-size: 14px; -webkit-line-clamp: 2; }
+.card--hero .card__foot { margin-top: auto; padding-top: 10px; }
 .card--hero .card__cover img { position: absolute; inset: 0; }
 
 /* photo card */
@@ -515,7 +479,7 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 
 /* ---------- right rail ---------- */
 
-.rail { display: flex; flex-direction: column; gap: 18px; position: sticky; top: calc(var(--header-h) + 64px); }
+.rail { display: flex; flex-direction: column; gap: 18px; position: sticky; top: calc(var(--header-h) + 26px); }
 
 .panel {
   background: var(--surface);
@@ -646,12 +610,11 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
   .topbar__inner { padding: 0 16px; gap: 12px; }
   .logo__badge { display: none; }
   .logo__word { display: none; }
-  .tabs__inner { padding: 0 10px; }
   .grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .card--hero .card__body { grid-template-columns: minmax(0, 1fr); }
   .card--hero .card__cover { aspect-ratio: 16 / 9; min-height: 0; }
   .card--hero .card__inner { padding: 18px 18px 16px; }
-  .card--hero .card__title { font-size: 22px; }
+  .card--hero .card__title { font-size: 20px; }
   .feed__head h1 { font-size: 23px; }
   .ticker { font-size: 12.5px; }
   .foot { padding: 0 16px 34px; }
@@ -707,9 +670,6 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
     </div>
   </div>
 
-  <nav class="tabs" aria-label="Разделы ленты">
-    <div class="tabs__inner" id="tabs"></div>
-  </nav>
 </header>
 
 <main class="layout">
@@ -1066,12 +1026,10 @@ const TRENDS = [
   { tag: "сон", label: "сон", sub: "29 публикаций" }
 ];
 
-const CATS = ["Главное", "Новости", "Технологии", "Наука", "Город", "Спорт", "Культура", "Здоровье"];
 const PAGE = 6;
 const STEP = 4;
 
 const state = {
-  cat: "Главное",
   view: "home",
   q: "",
   shown: PAGE,
@@ -1107,7 +1065,6 @@ const els = {
   more: $("#more"),
   title: $("#feedTitle"),
   count: $("#feedCount"),
-  tabs: $("#tabs"),
   search: $("#searchInput"),
   clear: $("#clearSearch"),
   savedCount: $("#savedCount"),
@@ -1148,7 +1105,6 @@ function matches(article) {
   if (state.view === "history" && !state.read.has(article.id)) return false;
   if (state.view === "subs" && !state.subs.has(article.channel)) return false;
   if (state.view === "drafts") return false;
-  if (state.view === "home" && state.cat !== "Главное" && article.cat !== state.cat) return false;
   if (state.q) {
     const hay = (article.title + " " + article.excerpt + " " + article.channel + " " + article.tags.join(" ")).toLowerCase();
     if (!hay.includes(state.q)) return false;
@@ -1240,7 +1196,7 @@ function viewTitle() {
   if (state.view === "subs") return "Подписки";
   if (state.view === "drafts") return "Мои публикации";
   if (state.q) return "Поиск";
-  return state.cat;
+  return "Главное";
 }
 
 function render() {
@@ -1274,14 +1230,7 @@ function render() {
   }
 
   els.savedCount.textContent = state.saved.size;
-  syncTabs();
   syncSide();
-}
-
-function syncTabs() {
-  els.tabs.querySelectorAll(".tab").forEach((tab) => {
-    tab.setAttribute("aria-selected", String(tab.dataset.cat === state.cat && state.view === "home"));
-  });
 }
 
 function syncSide() {
@@ -1291,12 +1240,6 @@ function syncSide() {
     if (on) btn.setAttribute("aria-current", "page");
     else btn.removeAttribute("aria-current");
   });
-}
-
-function buildTabs() {
-  els.tabs.innerHTML = CATS.map((cat, i) =>
-    '<button class="tab" type="button" role="tab" data-cat="' + cat + '" aria-selected="' + (i === 0) + '">' + cat + "</button>"
-  ).join("");
 }
 
 function buildTrends() {
@@ -1324,16 +1267,6 @@ function buildChannels() {
       "</li>"
     );
   }).join("");
-}
-
-function setCategory(cat) {
-  state.cat = cat;
-  state.view = "home";
-  state.q = "";
-  els.search.value = "";
-  els.clear.hidden = true;
-  state.shown = PAGE;
-  render();
 }
 
 function setView(view) {
@@ -1472,17 +1405,11 @@ function initTicker() {
   }, 5200);
 }
 
-buildTabs();
 buildTrends();
 buildChannels();
 initTheme();
 initTicker();
 render();
-
-els.tabs.addEventListener("click", (e) => {
-  const tab = e.target.closest(".tab");
-  if (tab) setCategory(tab.dataset.cat);
-});
 
 document.querySelectorAll(".side__link").forEach((btn) => {
   btn.addEventListener("click", () => setView(btn.dataset.view));
@@ -1519,7 +1446,6 @@ els.more.addEventListener("click", () => {
 });
 
 $("#resetFilters").addEventListener("click", () => {
-  state.cat = "Главное";
   state.view = "home";
   state.q = "";
   els.search.value = "";
@@ -1532,7 +1458,6 @@ els.trends.addEventListener("click", (e) => {
   const btn = e.target.closest("[data-trend]");
   if (!btn) return;
   state.view = "home";
-  state.cat = "Главное";
   els.search.value = btn.dataset.trend;
   applySearch(btn.dataset.trend);
   els.search.focus();
@@ -1558,7 +1483,12 @@ els.themeBtn.addEventListener("click", () => {
 
 $("#logoLink").addEventListener("click", (e) => {
   e.preventDefault();
-  setCategory("Главное");
+  state.view = "home";
+  state.q = "";
+  els.search.value = "";
+  els.clear.hidden = true;
+  state.shown = PAGE;
+  render();
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
