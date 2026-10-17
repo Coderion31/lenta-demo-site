@@ -159,11 +159,13 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 }
 [data-theme="dark"] .search input { background: #ffffff; color: #0f1014; }
 .search input::placeholder { color: #6f7280; font-weight: 700; opacity: 1; }
-.search input:focus {
+.search input:focus,
+.search input:focus-visible {
   outline: none;
+  outline-offset: 0;
   background: #ffffff;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px var(--accent-soft);
+  border-color: #c9cad4;
+  box-shadow: none;
 }
 .search__clear {
   position: absolute; right: 11px; top: 50%; transform: translateY(-50%);
