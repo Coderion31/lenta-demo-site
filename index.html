@@ -214,10 +214,37 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 .side {
   position: sticky;
   top: calc(var(--header-h) + 26px);
-  display: flex; flex-direction: column; gap: 22px;
+  display: flex; flex-direction: column; gap: 20px;
+  max-height: calc(100vh - var(--header-h) - 46px);
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .side__nav { display: flex; flex-direction: column; gap: 2px; }
+
+.side__label {
+  padding: 0 12px 6px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  color: var(--muted);
+}
+
+.side__group { display: flex; flex-direction: column; gap: 2px; }
+
+.side__link--cat { padding: 8px 12px; font-size: 14px; }
+.side__link--cat svg { width: 18px; height: 18px; }
+.side__link--cat.is-active {
+  background: var(--surface-2);
+  box-shadow: inset 0 0 0 1.5px var(--line-strong);
+  color: var(--ink);
+  font-weight: 600;
+}
+.side__link--cat.is-active svg { color: var(--accent); }
+
+.side__dot {
+  margin-left: auto; flex: none;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #ff6a3d;
+}
 
 .side__link {
   display: flex; align-items: center; gap: 11px;
@@ -693,6 +720,11 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
       </button>
     </nav>
 
+    <div class="side__group">
+      <p class="side__label">Разделы</p>
+      <nav class="side__nav" id="catNav" aria-label="Разделы ленты"></nav>
+    </div>
+
     <div class="side__note">
       <p class="side__note-title">Это макет</p>
       <p>Интерфейс собран для демонстрации: публикации, каналы и счётчики вымышлены и не связаны с Яндекс Дзеном.</p>
@@ -1024,7 +1056,44 @@ const TRENDS = [
 const PAGE = 6;
 const STEP = 4;
 
+const CATS = [
+  {
+    name: "Главное",
+    icon: '<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>'
+  },
+  {
+    name: "Новости",
+    dot: true,
+    icon: '<path d="M13 3 6.5 13H11l-1 8 7-10h-4.5Z"/>'
+  },
+  {
+    name: "Технологии",
+    icon: '<rect x="7" y="7" width="10" height="10" rx="2.4"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/>'
+  },
+  {
+    name: "Наука",
+    icon: '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="8.6" ry="4"/><ellipse cx="12" cy="12" rx="8.6" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="8.6" ry="4" transform="rotate(120 12 12)"/>'
+  },
+  {
+    name: "Город",
+    icon: '<path d="M4 20h16M6.5 20V9.5h4.5V20M13 20V4.5h4.5V20"/><path d="M8.6 12.6h.01M8.6 15.6h.01M15.1 7.6h.01M15.1 10.6h.01M15.1 13.6h.01"/>'
+  },
+  {
+    name: "Спорт",
+    icon: '<path d="M3 12h3.6L9.4 5.6l4.2 12.8 2.2-6.4H21"/>'
+  },
+  {
+    name: "Культура",
+    icon: '<path d="M5 5.4A1.4 1.4 0 0 1 6.4 4H19v15.2H6.4A1.4 1.4 0 0 0 5 20.6Z"/><path d="M5 17.4h14"/>'
+  },
+  {
+    name: "Здоровье",
+    icon: '<path d="M12 20s-7-4.4-7-9a3.9 3.9 0 0 1 7-2.5A3.9 3.9 0 0 1 19 11c0 4.6-7 9-7 9Z"/>'
+  }
+];
+
 const state = {
+  cat: "Главное",
   view: "home",
   q: "",
   shown: PAGE,
@@ -1060,6 +1129,7 @@ const els = {
   more: $("#more"),
   title: $("#feedTitle"),
   count: $("#feedCount"),
+  catNav: $("#catNav"),
   search: $("#searchInput"),
   clear: $("#clearSearch"),
   savedCount: $("#savedCount"),
@@ -1100,6 +1170,7 @@ function matches(article) {
   if (state.view === "history" && !state.read.has(article.id)) return false;
   if (state.view === "subs" && !state.subs.has(article.channel)) return false;
   if (state.view === "drafts") return false;
+  if (state.view === "home" && state.cat !== "Главное" && article.cat !== state.cat) return false;
   if (state.q) {
     const hay = (article.title + " " + article.excerpt + " " + article.channel + " " + article.tags.join(" ")).toLowerCase();
     if (!hay.includes(state.q)) return false;
@@ -1191,6 +1262,7 @@ function viewTitle() {
   if (state.view === "subs") return "Подписки";
   if (state.view === "drafts") return "Мои публикации";
   if (state.q) return "Поиск";
+  if (state.view === "home") return state.cat;
   return "Главное";
 }
 
@@ -1225,6 +1297,7 @@ function render() {
   }
 
   els.savedCount.textContent = state.saved.size;
+  syncCats();
   syncSide();
 }
 
@@ -1235,6 +1308,39 @@ function syncSide() {
     if (on) btn.setAttribute("aria-current", "page");
     else btn.removeAttribute("aria-current");
   });
+}
+
+function buildCatNav() {
+  els.catNav.innerHTML = CATS.map((c) => {
+    const on = state.view === "home" && state.cat === c.name;
+    return (
+      '<button class="side__link side__link--cat' + (on ? " is-active" : "") + '" type="button" data-cat="' + c.name + '"' + (on ? ' aria-current="page"' : "") + ">" +
+        '<svg viewBox="0 0 24 24" aria-hidden="true">' + c.icon + "</svg>" +
+        "<span>" + c.name + "</span>" +
+        (c.dot ? '<span class="side__dot" aria-hidden="true"></span>' : "") +
+      "</button>"
+    );
+  }).join("");
+}
+
+function syncCats() {
+  if (!els.catNav) return;
+  els.catNav.querySelectorAll("[data-cat]").forEach((btn) => {
+    const on = state.view === "home" && btn.dataset.cat === state.cat;
+    btn.classList.toggle("is-active", on);
+    if (on) btn.setAttribute("aria-current", "page");
+    else btn.removeAttribute("aria-current");
+  });
+}
+
+function setCategory(cat) {
+  state.cat = cat;
+  state.view = "home";
+  state.q = "";
+  els.search.value = "";
+  els.clear.hidden = true;
+  state.shown = PAGE;
+  render();
 }
 
 function buildTrends() {
@@ -1400,14 +1506,20 @@ function initTicker() {
   }, 5200);
 }
 
+buildCatNav();
 buildTrends();
 buildChannels();
 initTheme();
 initTicker();
 render();
 
-document.querySelectorAll(".side__link").forEach((btn) => {
+document.querySelectorAll(".side__link[data-view]").forEach((btn) => {
   btn.addEventListener("click", () => setView(btn.dataset.view));
+});
+
+els.catNav.addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-cat]");
+  if (btn) setCategory(btn.dataset.cat);
 });
 
 els.search.addEventListener("input", (e) => applySearch(e.target.value));
@@ -1441,6 +1553,7 @@ els.more.addEventListener("click", () => {
 });
 
 $("#resetFilters").addEventListener("click", () => {
+  state.cat = "Главное";
   state.view = "home";
   state.q = "";
   els.search.value = "";
@@ -1478,12 +1591,7 @@ els.themeBtn.addEventListener("click", () => {
 
 $("#logoLink").addEventListener("click", (e) => {
   e.preventDefault();
-  state.view = "home";
-  state.q = "";
-  els.search.value = "";
-  els.clear.hidden = true;
-  state.shown = PAGE;
-  render();
+  setCategory("Главное");
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
