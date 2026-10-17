@@ -218,30 +218,25 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 }
 
 .railnav {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-  padding: 8px 0;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 18px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 0;
+  background: none;
+  border: 0;
+  border-radius: 0;
 }
 
 .railnav__btn {
   position: relative;
   width: 44px; height: 44px;
   display: grid; place-items: center;
-  border: 0; border-radius: 12px;
+  border: 0; border-radius: 0;
   background: none; color: var(--ink-2);
   cursor: pointer;
-  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+  transition: color .15s ease;
 }
-.railnav__btn svg { width: 22px; height: 22px; color: var(--muted); }
-.railnav__btn:hover { background: var(--surface-2); }
-.railnav__btn:hover svg { color: var(--ink-2); }
-.railnav__btn.is-active {
-  background: var(--surface-2);
-  box-shadow: inset 0 0 0 1.5px var(--line-strong);
-}
-.railnav__btn.is-active svg { color: var(--ink); }
+.railnav__btn svg { width: 22px; height: 22px; color: inherit; }
+.railnav__btn:hover,
+.railnav__btn.is-active { background: none; box-shadow: none; color: var(--ink-2); }
 
 .railnav__dot {
   position: absolute; top: 9px; right: 9px;
