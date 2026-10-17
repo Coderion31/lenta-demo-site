@@ -206,79 +206,57 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
   margin: 0 auto;
   padding: 26px 24px 40px;
   display: grid;
-  grid-template-columns: 214px minmax(0, 1fr) 292px;
-  gap: 28px;
+  grid-template-columns: 64px minmax(0, 1fr) 292px;
+  gap: 24px;
   align-items: start;
 }
 
-.side {
+.railnav-wrap {
   position: sticky;
   top: calc(var(--header-h) + 26px);
-  display: flex; flex-direction: column; gap: 20px;
-  max-height: calc(100vh - var(--header-h) - 46px);
-  overflow-y: auto;
-  scrollbar-width: thin;
 }
 
-.side__nav { display: flex; flex-direction: column; gap: 2px; }
-
-.side__label {
-  padding: 0 12px 6px;
-  font-size: 10.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
-  color: var(--muted);
+.railnav {
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  padding: 8px 0;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
 }
 
-.side__group { display: flex; flex-direction: column; gap: 2px; }
-
-.side__link--cat { padding: 8px 12px; font-size: 14px; }
-.side__link--cat svg { width: 18px; height: 18px; }
-.side__link--cat.is-active {
+.railnav__btn {
+  position: relative;
+  width: 44px; height: 44px;
+  display: grid; place-items: center;
+  border: 0; border-radius: 12px;
+  background: none; color: var(--ink-2);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.railnav__btn svg { width: 22px; height: 22px; color: var(--muted); }
+.railnav__btn:hover { background: var(--surface-2); }
+.railnav__btn:hover svg { color: var(--ink-2); }
+.railnav__btn.is-active {
   background: var(--surface-2);
   box-shadow: inset 0 0 0 1.5px var(--line-strong);
-  color: var(--ink);
-  font-weight: 600;
 }
-.side__link--cat.is-active svg { color: var(--accent); }
+.railnav__btn.is-active svg { color: var(--ink); }
 
-.side__dot {
-  margin-left: auto; flex: none;
-  width: 7px; height: 7px; border-radius: 50%;
+.railnav__dot {
+  position: absolute; top: 9px; right: 9px;
+  width: 6px; height: 6px; border-radius: 50%;
   background: #ff6a3d;
 }
 
-.side__link {
-  display: flex; align-items: center; gap: 11px;
-  width: 100%;
-  padding: 9px 12px;
-  border: 0; border-radius: var(--radius-sm);
-  background: none; cursor: pointer;
-  color: var(--ink-2);
-  font-size: 14.5px; font-weight: 500;
-  text-align: left;
-  transition: background .15s ease, color .15s ease;
-}
-.side__link svg { width: 19px; height: 19px; flex: none; color: var(--muted); }
-.side__link:hover { background: var(--surface); color: var(--ink); }
-.side__link.is-active { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: var(--shadow); }
-.side__link.is-active svg { color: var(--accent); }
-.side__count {
-  margin-left: auto;
-  min-width: 20px; height: 20px;
-  padding: 0 6px;
-  display: grid; place-items: center;
+.railnav__badge {
+  position: absolute; top: 6px; right: 6px;
+  min-width: 15px; height: 15px; padding: 0 4px;
+  display: none; place-items: center;
   border-radius: 999px;
-  background: var(--accent-soft); color: var(--accent-ink);
-  font-size: 11.5px; font-weight: 650;
+  background: var(--accent); color: #fff;
+  font-size: 10px; font-weight: 700; line-height: 1;
 }
-
-.side__note {
-  border-top: 1px solid var(--line);
-  padding: 14px 12px 0 12px;
-  color: var(--muted);
-  font-size: 12.5px;
-  line-height: 1.55;
-}
-.side__note-title { color: var(--ink); font-weight: 600; font-size: 12.5px; margin-bottom: 4px; }
+.railnav__badge.is-on { display: grid; }
 
 .feed { min-width: 0; }
 
@@ -623,14 +601,14 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 /* ---------- responsive ---------- */
 
 @media (max-width: 1180px) {
-  .layout { grid-template-columns: 196px minmax(0, 1fr); }
+  .layout { grid-template-columns: 64px minmax(0, 1fr); }
   .rail { display: none; }
 }
 
 @media (max-width: 900px) {
   :root { --header-h: 56px; }
   .layout { grid-template-columns: minmax(0, 1fr); padding: 18px 16px 32px; }
-  .side { display: none; }
+  .railnav-wrap { display: none; }
   .topbar__inner { padding: 0 16px; gap: 12px; }
   .logo__word { font-size: 18px; }
   .grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
@@ -695,40 +673,29 @@ svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round
 </header>
 
 <main class="layout">
-  <aside class="side" aria-label="Меню">
-    <nav class="side__nav" id="sideNav">
-      <button class="side__link is-active" type="button" data-view="home" aria-current="page">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4Z" /><path d="M10 20v-5h4v5" /></svg>
-        <span>Главная</span>
+  <aside class="railnav-wrap" aria-label="Меню">
+    <nav class="railnav" id="sideNav">
+      <button class="railnav__btn" type="button" data-view="drafts" title="Мои публикации" aria-label="Мои публикации">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 8.2v7.6M8.2 12h7.6" /></svg>
       </button>
-      <button class="side__link" type="button" data-view="subs">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" /></svg>
-        <span>Подписки</span>
+      <button class="railnav__btn is-active" type="button" data-view="home" title="Главная" aria-label="Главная" aria-current="page">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4.5" width="16" height="15" rx="3.2" /><path d="M8 9.6h8M8 12.8h8M8 16h5" /></svg>
+        <span class="railnav__dot" aria-hidden="true"></span>
       </button>
-      <button class="side__link" type="button" data-view="saved">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.6L7 20Z" /></svg>
-        <span>Закладки</span>
-        <span class="side__count" id="savedCount">0</span>
+      <button class="railnav__btn" type="button" data-view="subs" title="Подписки" aria-label="Подписки">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12c1.5-2.3 2.7-3.5 4.3-3.5a3.5 3.5 0 0 1 0 7c-1.6 0-2.8-1.2-4.3-3.5-1.5 2.3-2.7 3.5-4.3 3.5a3.5 3.5 0 0 1 0-7c1.6 0 2.8 1.2 4.3 3.5Z" /></svg>
       </button>
-      <button class="side__link" type="button" data-view="history">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v5l3.2 2" /><circle cx="12" cy="12" r="8.2" /></svg>
-        <span>История</span>
+      <button class="railnav__btn" type="button" data-view="saved" title="Закладки" aria-label="Закладки">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h10" /></svg>
+        <span class="railnav__badge" id="savedCount">0</span>
       </button>
-      <button class="side__link" type="button" data-view="drafts">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19h14M7 15.5 16.5 6l2.5 2.5L9.5 18H7Z" /></svg>
-        <span>Мои публикации</span>
+      <button class="railnav__btn" type="button" data-view="history" title="История" aria-label="История">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3.2" /><circle cx="12" cy="12" r="2.1" /></svg>
+      </button>
+      <button class="railnav__btn" type="button" data-view="read" title="Прочитано" aria-label="Прочитано">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="m7.8 12.2 2.9 2.9 5.5-5.7" /></svg>
       </button>
     </nav>
-
-    <div class="side__group">
-      <p class="side__label">Разделы</p>
-      <nav class="side__nav" id="catNav" aria-label="Разделы ленты"></nav>
-    </div>
-
-    <div class="side__note">
-      <p class="side__note-title">Это макет</p>
-      <p>Интерфейс собран для демонстрации: публикации, каналы и счётчики вымышлены и не связаны с Яндекс Дзеном.</p>
-    </div>
   </aside>
 
   <section class="feed" id="feed">
@@ -1056,44 +1023,7 @@ const TRENDS = [
 const PAGE = 6;
 const STEP = 4;
 
-const CATS = [
-  {
-    name: "Главное",
-    icon: '<rect x="4" y="4" width="7" height="7" rx="2"/><rect x="13" y="4" width="7" height="7" rx="2"/><rect x="4" y="13" width="7" height="7" rx="2"/><rect x="13" y="13" width="7" height="7" rx="2"/>'
-  },
-  {
-    name: "Новости",
-    dot: true,
-    icon: '<path d="M13 3 6.5 13H11l-1 8 7-10h-4.5Z"/>'
-  },
-  {
-    name: "Технологии",
-    icon: '<rect x="7" y="7" width="10" height="10" rx="2.4"/><path d="M10 3v4M14 3v4M10 17v4M14 17v4M3 10h4M3 14h4M17 10h4M17 14h4"/>'
-  },
-  {
-    name: "Наука",
-    icon: '<circle cx="12" cy="12" r="2"/><ellipse cx="12" cy="12" rx="8.6" ry="4"/><ellipse cx="12" cy="12" rx="8.6" ry="4" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="8.6" ry="4" transform="rotate(120 12 12)"/>'
-  },
-  {
-    name: "Город",
-    icon: '<path d="M4 20h16M6.5 20V9.5h4.5V20M13 20V4.5h4.5V20"/><path d="M8.6 12.6h.01M8.6 15.6h.01M15.1 7.6h.01M15.1 10.6h.01M15.1 13.6h.01"/>'
-  },
-  {
-    name: "Спорт",
-    icon: '<path d="M3 12h3.6L9.4 5.6l4.2 12.8 2.2-6.4H21"/>'
-  },
-  {
-    name: "Культура",
-    icon: '<path d="M5 5.4A1.4 1.4 0 0 1 6.4 4H19v15.2H6.4A1.4 1.4 0 0 0 5 20.6Z"/><path d="M5 17.4h14"/>'
-  },
-  {
-    name: "Здоровье",
-    icon: '<path d="M12 20s-7-4.4-7-9a3.9 3.9 0 0 1 7-2.5A3.9 3.9 0 0 1 19 11c0 4.6-7 9-7 9Z"/>'
-  }
-];
-
 const state = {
-  cat: "Главное",
   view: "home",
   q: "",
   shown: PAGE,
@@ -1129,7 +1059,6 @@ const els = {
   more: $("#more"),
   title: $("#feedTitle"),
   count: $("#feedCount"),
-  catNav: $("#catNav"),
   search: $("#searchInput"),
   clear: $("#clearSearch"),
   savedCount: $("#savedCount"),
@@ -1168,9 +1097,9 @@ function initials(name) {
 function matches(article) {
   if (state.view === "saved" && !state.saved.has(article.id)) return false;
   if (state.view === "history" && !state.read.has(article.id)) return false;
+  if (state.view === "read" && !state.read.has(article.id)) return false;
   if (state.view === "subs" && !state.subs.has(article.channel)) return false;
   if (state.view === "drafts") return false;
-  if (state.view === "home" && state.cat !== "Главное" && article.cat !== state.cat) return false;
   if (state.q) {
     const hay = (article.title + " " + article.excerpt + " " + article.channel + " " + article.tags.join(" ")).toLowerCase();
     if (!hay.includes(state.q)) return false;
@@ -1259,10 +1188,10 @@ function cardHTML(a, index) {
 function viewTitle() {
   if (state.view === "saved") return "Закладки";
   if (state.view === "history") return "История";
+  if (state.view === "read") return "Прочитано";
   if (state.view === "subs") return "Подписки";
   if (state.view === "drafts") return "Мои публикации";
   if (state.q) return "Поиск";
-  if (state.view === "home") return state.cat;
   return "Главное";
 }
 
@@ -1291,56 +1220,23 @@ function render() {
         ? "Вы пока ничего не сохранили. Нажмите на закладку в карточке, чтобы вернуться к публикации позже."
         : state.view === "history"
           ? "Вы ещё ничего не открывали в этой сессии."
-          : "Попробуйте другой запрос или выберите раздел заново.";
+          : "Попробуйте другой запрос или сбросьте фильтры.";
   } else {
     els.empty.hidden = true;
   }
 
   els.savedCount.textContent = state.saved.size;
-  syncCats();
+  els.savedCount.classList.toggle("is-on", state.saved.size > 0);
   syncSide();
 }
 
 function syncSide() {
-  document.querySelectorAll(".side__link").forEach((btn) => {
+  document.querySelectorAll(".railnav__btn").forEach((btn) => {
     const on = btn.dataset.view === state.view;
     btn.classList.toggle("is-active", on);
     if (on) btn.setAttribute("aria-current", "page");
     else btn.removeAttribute("aria-current");
   });
-}
-
-function buildCatNav() {
-  els.catNav.innerHTML = CATS.map((c) => {
-    const on = state.view === "home" && state.cat === c.name;
-    return (
-      '<button class="side__link side__link--cat' + (on ? " is-active" : "") + '" type="button" data-cat="' + c.name + '"' + (on ? ' aria-current="page"' : "") + ">" +
-        '<svg viewBox="0 0 24 24" aria-hidden="true">' + c.icon + "</svg>" +
-        "<span>" + c.name + "</span>" +
-        (c.dot ? '<span class="side__dot" aria-hidden="true"></span>' : "") +
-      "</button>"
-    );
-  }).join("");
-}
-
-function syncCats() {
-  if (!els.catNav) return;
-  els.catNav.querySelectorAll("[data-cat]").forEach((btn) => {
-    const on = state.view === "home" && btn.dataset.cat === state.cat;
-    btn.classList.toggle("is-active", on);
-    if (on) btn.setAttribute("aria-current", "page");
-    else btn.removeAttribute("aria-current");
-  });
-}
-
-function setCategory(cat) {
-  state.cat = cat;
-  state.view = "home";
-  state.q = "";
-  els.search.value = "";
-  els.clear.hidden = true;
-  state.shown = PAGE;
-  render();
 }
 
 function buildTrends() {
@@ -1418,7 +1314,7 @@ function openReader(id) {
 function closeReader() {
   els.reader.hidden = true;
   document.body.style.overflow = "";
-  if (state.view === "history") render();
+  if (state.view === "history" || state.view === "read") render();
 }
 
 function onGridClick(event) {
@@ -1506,20 +1402,14 @@ function initTicker() {
   }, 5200);
 }
 
-buildCatNav();
 buildTrends();
 buildChannels();
 initTheme();
 initTicker();
 render();
 
-document.querySelectorAll(".side__link[data-view]").forEach((btn) => {
+document.querySelectorAll(".railnav__btn[data-view]").forEach((btn) => {
   btn.addEventListener("click", () => setView(btn.dataset.view));
-});
-
-els.catNav.addEventListener("click", (e) => {
-  const btn = e.target.closest("[data-cat]");
-  if (btn) setCategory(btn.dataset.cat);
 });
 
 els.search.addEventListener("input", (e) => applySearch(e.target.value));
@@ -1553,7 +1443,6 @@ els.more.addEventListener("click", () => {
 });
 
 $("#resetFilters").addEventListener("click", () => {
-  state.cat = "Главное";
   state.view = "home";
   state.q = "";
   els.search.value = "";
@@ -1591,7 +1480,7 @@ els.themeBtn.addEventListener("click", () => {
 
 $("#logoLink").addEventListener("click", (e) => {
   e.preventDefault();
-  setCategory("Главное");
+  setView("home");
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
 
