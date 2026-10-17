@@ -456,6 +456,28 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 }
 .card--note.is-tinted { background: var(--surface-2); }
 
+/* ---------- skeleton ---------- */
+
+.skel { pointer-events: none; }
+.skel__line {
+  display: block;
+  width: 100%;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--line) 25%, var(--surface-2) 37%, var(--line) 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+.skel__line--xs { width: 34%; height: 10px; }
+.skel__line--sm { width: 24%; height: 10px; }
+.skel__line--md { width: 58%; }
+.skel__line--lg { width: 92%; height: 18px; }
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
 /* ---------- empty & more ---------- */
 
 .empty {
@@ -1048,6 +1070,7 @@ const PAGE = 6;
 const STEP = 4;
 
 const state = {
+  articles: [],
   view: "home",
   q: "",
   shown: PAGE,
@@ -1495,11 +1518,25 @@ function feedItem(node, feed) {
 }
 
 async function fetchFeed(feed) {
-  const res = await fetch(feed.url, { mode: "cors", cache: "no-store" });
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  const xml = await res.text();
-  const doc = new DOMParser().parseFromString(xml, "application/xml");
-  return Array.from(doc.getElementsByTagName("item")).map((n) => feedItem(n, feed)).filter(Boolean);
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
+  try {
+    const res = await fetch(feed.url, { mode: "cors", cache: "no-store", signal: ctrl.signal });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const buf = await res.arrayBuffer();
+    const ctype = res.headers.get("content-type") || "";
+    const m = /charset=([^;]+)/i.exec(ctype);
+    let charset = m ? m[1].trim().toLowerCase() : "utf-8";
+    if (charset === "cp1251" || charset === "windows-1251") charset = "windows-1251";
+    let xml;
+    try { xml = new TextDecoder(charset).decode(buf); }
+    catch (e) { xml = new TextDecoder("utf-8").decode(buf); }
+    xml = xml.replace(/^\uFEFF/, "").replace(/<\?xml[^>]*\?>/, "");
+    const doc = new DOMParser().parseFromString(xml, "application/xml");
+    return Array.from(doc.getElementsByTagName("item")).map((n) => feedItem(n, feed)).filter(Boolean);
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function setFeedStatus(text, kind) {
@@ -1528,10 +1565,32 @@ async function loadNews() {
     const t = new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
     setFeedStatus("Обновлено в " + t + " · Газета.Ru", "live");
   } catch (e) {
+    if (!state.articles.length) {
+      state.articles = ARTICLES.slice();
+      state.shown = PAGE;
+      render();
+    }
     setFeedStatus("Нет связи с источниками — офлайн-подборка за 17 октября", "offline");
   } finally {
     if (els.refreshNews) els.refreshNews.disabled = false;
   }
+}
+
+function renderSkeleton() {
+  const row = (w) => '<span class="skel__line' + (w ? " skel__line--" + w : "") + '"></span>';
+  els.grid.innerHTML = Array.from({ length: 6 }).map(() => (
+    '<article class="card card--note skel" aria-hidden="true">' +
+      '<div class="card__inner">' +
+        row("xs") +
+        row("lg") +
+        row("") +
+        row("md") +
+      "</div>" +
+    "</article>"
+  )).join("");
+  els.count.textContent = "Загружаю…";
+  els.empty.hidden = true;
+  els.more.hidden = true;
 }
 
 const newsCache = load(NEWS_KEY, null);
@@ -1543,7 +1602,8 @@ buildTrends();
 buildChannels();
 initTheme();
 initTicker();
-render();
+if (state.articles.length) render();
+else renderSkeleton();
 
 document.querySelectorAll(".railnav__btn[data-view]").forEach((btn) => {
   btn.addEventListener("click", () => setView(btn.dataset.view));
