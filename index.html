@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" data-theme="light">
+<html lang="ru" data-theme="dark">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -28,17 +28,17 @@
 }
 
 [data-theme="dark"] {
-  --bg: #0d0e11;
-  --surface: #16171c;
-  --surface-2: #1c1d24;
-  --ink: #f2f2f6;
-  --ink-2: #c6c7d3;
-  --muted: #8b8d9c;
-  --line: #272932;
-  --line-strong: #343643;
-  --accent: #a68bfb;
-  --accent-soft: #241c3e;
-  --accent-ink: #c0aeff;
+  --bg: #121316;
+  --surface: #1b1d22;
+  --surface-2: #202329;
+  --ink: #f1f2f4;
+  --ink-2: #c9ccd3;
+  --muted: #9aa0aa;
+  --line: rgba(255, 255, 255, .08);
+  --line-strong: rgba(255, 255, 255, .16);
+  --accent: #8a7cf0;
+  --accent-soft: #262039;
+  --accent-ink: #b7abff;
   --like: #ff5c8a;
   --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 10px 26px -18px rgba(0, 0, 0, .9);
   --shadow-lift: 0 2px 8px rgba(0, 0, 0, .5), 0 22px 40px -24px rgba(0, 0, 0, 1);
@@ -166,6 +166,8 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   color: #3f424f;
 }
 .search__clear svg { width: 14px; height: 14px; stroke-width: 2; }
+
+.search-toggle { display: none; }
 
 .topbar__actions { display: flex; align-items: center; gap: 6px; flex: none; }
 
@@ -589,6 +591,34 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   border-top: 1px solid var(--line);
 }
 
+/* ---------- mobile tab bar ---------- */
+
+.tabbar {
+  display: none;
+  position: fixed;
+  left: 0; right: 0; bottom: 0;
+  z-index: 35;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 2px;
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--surface) 94%, transparent);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--line);
+  transition: transform .22s ease;
+}
+.tabbar.is-hidden { transform: translateY(110%); }
+
+.tabbar__btn {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  padding: 4px 0;
+  border: 0; background: none;
+  color: var(--muted);
+  font-size: 10px; letter-spacing: .01em;
+  cursor: pointer;
+}
+.tabbar__btn svg { width: 22px; height: 22px; }
+.tabbar__btn.is-active { color: var(--ink); }
+
 /* ---------- responsive ---------- */
 
 @media (max-width: 1180px) {
@@ -600,7 +630,20 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   :root { --header-h: 56px; }
   .layout { grid-template-columns: minmax(0, 1fr); padding: 18px 16px 32px; }
   .railnav-wrap { display: none; }
-  .topbar__inner { padding: 0 16px; gap: 12px; }
+  .topbar__inner { padding: 0 16px; gap: 12px; position: relative; }
+  .search-toggle { display: grid; }
+  .search { display: none; }
+  .search.is-open {
+    display: block;
+    position: absolute;
+    left: 12px; right: 12px; top: 6px;
+    z-index: 40;
+    max-width: none;
+    margin: 0;
+  }
+  .search input { height: 44px; font-size: 15px; }
+  .tabbar { display: grid; }
+  body { padding-bottom: calc(64px + env(safe-area-inset-bottom)); }
   .grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
   .card--hero .card__body { grid-template-columns: minmax(0, 1fr); }
   .card--hero .card__cover { aspect-ratio: 16 / 9; min-height: 0; }
@@ -644,6 +687,9 @@ svg.ico-fill { fill: currentColor; stroke: none; }
     </form>
 
     <div class="topbar__actions">
+      <button class="iconbtn search-toggle" id="searchToggle" type="button" aria-label="Поиск" aria-expanded="false">
+        <svg class="ico-fill" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" fill-rule="evenodd" d="M17.2 18.925a9.72 9.72 0 0 1-6.154 2.184c-5.39 0-9.76-4.37-9.76-9.76 0-5.391 4.37-9.761 9.76-9.761s9.76 4.37 9.76 9.76a9.72 9.72 0 0 1-2.19 6.163l2.965 2.967c.198.197.297.296.348.403a.7.7 0 0 1 0 .607c-.051.108-.15.206-.348.404-.197.197-.296.296-.403.348a.7.7 0 0 1-.607 0c-.108-.052-.206-.15-.404-.348zm1.606-7.577a7.76 7.76 0 1 1-15.52 0 7.76 7.76 0 0 1 15.52 0" clip-rule="evenodd" /></svg>
+      </button>
       <button class="iconbtn" id="themeToggle" type="button" aria-pressed="false">
         <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2" /><path d="M12 2.6v2.1M12 19.3v2.1M4.2 4.2l1.5 1.5M18.3 18.3l1.5 1.5M2.6 12h2.1M19.3 12h2.1M4.2 19.8l1.5-1.5M18.3 5.7l1.5-1.5" /></svg>
         <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.4A8.2 8.2 0 0 1 9.6 4a8.4 8.4 0 1 0 10.4 10.4Z" /></svg>
@@ -747,6 +793,29 @@ svg.ico-fill { fill: currentColor; stroke: none; }
     <div class="reader__body" id="readerBody"></div>
   </article>
 </div>
+
+<nav class="tabbar" id="tabbar" aria-label="Навигация">
+  <button class="tabbar__btn is-active" type="button" data-view="home" aria-current="page">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10.5 12 4l8 6.5V20H4Z" /><path d="M10 20v-5h4v5" /></svg>
+    <span>Главная</span>
+  </button>
+  <button class="tabbar__btn" type="button" data-view="subs">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h10" /></svg>
+    <span>Подписки</span>
+  </button>
+  <button class="tabbar__btn" type="button" data-view="history">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v5l3.2 2" /><circle cx="12" cy="12" r="8.2" /></svg>
+    <span>История</span>
+  </button>
+  <button class="tabbar__btn" type="button" data-view="saved">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.6L7 20Z" /></svg>
+    <span>Закладки</span>
+  </button>
+  <button class="tabbar__btn" type="button" data-view="drafts">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.4" /><path d="M5.5 20c.6-3.5 3.3-5.5 6.5-5.5s5.9 2 6.5 5.5" /></svg>
+    <span>Профиль</span>
+  </button>
+</nav>
 
 <script>window.__NEWS__={ "updatedAt": "2026-10-18T08:19:24.874Z", "sources": [  "РИА Новости",  "ТАСС",  "РБК",  "Известия",  "Коммерсантъ",  "Ведомости",  "RT",  "Взгляд",  "МК",  "Москва 24",  "BFM.ru",  "Life",  "Комсомольская правда",  "Звезда",  "Forbes",  "Чемпионат",  "Газета.Ru · Политика",  "Газета.Ru · Общество",  "Газета.Ru · Спорт",  "Газета.Ru · Культура",  "Газета.Ru · Наука",  "Газета.Ru · Авто" ], "items": [  {   "title": "Германия — По ком звонит INSA?",   "url": "https://www.mknews.de/politics/2026/10/18/germaniya-po-kom-zvonit-insa.html",   "source": "МК",   "topic": "Общество",   "published": 1792314951000,   "excerpt": "Мерцу предстоит убедить немцев в результативности своего правительства. Вюсту — превратить личный авторитет в голоса за ХДС. Оба вынуждены играть по новым правилам: партий больше, прежние союзы слабее, а каждый дополнит…"  },  {   "title": "В Ленобласти проведут хоккейный спецтурнир",   "url": "https://www.mk-lenobl.ru/sport/2026/10/18/v-lenoblasti-provedut-khokkeynyy-specturnir.html",   "source": "МК",   "topic": "Общество",   "published": 1792311428000,   "excerpt": "В областном спорткомитете прошло рабочее совещание, на котором обсудили новую инициативу. В нем приняли участие глава комитета Вячеслав Комаров, руководитель Федерации школьного спорта Ватибор Зимовец и один из учредите…"  },  {   "title": "Хозяин дома погиб при сильном пожаре в Тверской области",   "url": "https://tver.mk.ru/incident/2026/10/18/khozyain-doma-pogib-pri-silnom-pozhare-v-tverskoy-oblasti.html",   "source": "МК",   "topic": "Общество",   "published": 1792311415000,   "excerpt": "В деревне Зубцовского округа Тверской области вечером субботы произошел сильный пожар, в результате которого погиб человек"  },  {   "title": "В Ленинградской области медики осмотрели десять человек после атаки БПЛА",   "url": "https://ria.ru/20261018/bpla-2125216847.html",   "source": "РИА Новости",   "topic": "Политика",   "published": 1792311410000,   "excerpt": ""  },  {   "title": "Майк Мэлотт раскрыл, что сказал ему Дана Уайт после победы нокаутом над Бакли",   "url": "https://www.championat.com/boxing/news-6662116-majk-melott-raskryl-chto-skazal-emu-dana-uajt-posle-pobedy-nokautom-nad-bakli.html",   "source": "Чемпионат",   "topic": "Спорт",   "published": 1792311404000,   "excerpt": "Канадский боец полусреднего веса (до 77 кг) Майк Мэлотт рассказал, как генеральный директор UFC Дана Уайт отреагировал на его победу в поединке с американцем Хоакином Бакли, состоявшемся на турнире UFC Fight Night 291 в…"  },  {   "title": "Блогерша Логецкая не возместила ущерб Центру бокса Кремлёва за присвоение 32 млн",   "url": "https://life.ru/p/ukravshaya-32-mln-blogersha-logetskaya-ne-vozmestila-uscherb-tsentru-boksa",   "source": "Life",   "topic": "Общество",   "published": 1792311402000,   "excerpt": "Осуждённая за многомиллионную аферу блогерша Виктория Логецкая до сих пор не компенсировала в полном объёме ущерб Центру прогресса бокса, основанному президентом Международной ассоциации бокса Умаром Кремлёвым. Об этом…"  },  {   "title": "Netflix зарегистрировал в России товарный знак логотипа c названием",   "url": "https://tass.ru/ekonomika/28226795",   "source": "ТАСС",   "topic": "Политика",   "published": 1792311379000,   "excerpt": "Он зарегистрирован по шести классам Международной классификации товаров и услуг"  },  {   "title": "В районах Забайкалья за сутки выпало до 25 мм снега",   "url": "https://tass.ru/obschestvo/28226791",   "source": "ТАСС",   "topic": "Политика",   "published": 1792311367000,   "excerpt": "Ситуация на дорогах контролируемая, в расчистке задействовали более 100 единиц транспорта"  },  {   "title": "«Эта ничья оставляет горький осадок». Батчи — о результате матча с «Локомотивом»",   "url": "https://www.championat.com/football/news-6662096-eta-nichya-ostavlyaet-gorkij-osadok-batchi-o-rezultate-matcha-s-lokomotivom.html",   "source": "Чемпионат",   "topic": "Спорт",   "published": 1792311305000,   "excerpt": "Нападающий «Краснодара» Жоау Батчи отметил, что команда правильно отреагировала при счёте 3:1 в пользу «Локомотива» в очном матче команд в 11-м туре Альфа-Банк РПЛ."  },  {   "title": "Мещеряков — о матче «Локо» с «Зенитом»: состав позволяет выигрывать у любой команды",   "url": "https://www.championat.com/basketball/news-6662112-mescheryakov-o-matche-loko-s-zenitom-sostav-pozvolyaet-vyigryvat-u-lyuboj-komandy.html",   "source": "Чемпионат",   "topic": "Спорт",   "published": 1792311292000,   "excerpt": "Бывший председатель правления «Локомотива‑Кубани» Анатолий Мещеряков высказался о предстоящем матче краснодарцев с «Зенитом»."  },  {   "title": "Эксперт Калмыков назвал санкции против РФ большим стимулом для постройки СКИФа",   "url": "https://tass.ru/nauka/28226787",   "source": "ТАСС",   "topic": "Политика",   "published": 1792311267000,   "excerpt": "Постройка подобных установок повышает интерес к сотрудничеству с Россией со стороны стран БРИКС и глобального Юга, отметил вице-президент РАН"  },  {   "title": "Зеленский сколотил баснословное состояние, считает Константинов",   "url": "https://ria.ru/20261018/zelenskij-2125216689.html",   "source": "РИА Новости",   "topic": "Политика",   "published": 1792311243000,   "excerpt": ""  },  {   "title": "855 задержанных и разгромленные магазины: Франция подсчитывает последствия протестов",   "url": "https://life.ru/p/855-zaderzhannyh-i-razgromlennye-magaziny-frantsiya-podschityvaet-posledstviya",   "source": "Life",   "topic": "Общество",   "published": 1792311198000,   "excerpt": "В Париже и пригородах во время протестов 17 октября задержали 855 человек. Префектура полиции назвала этот показатель рекордным, сообщает Le Parisien. Акции против роста стоимости жизни сопровождались столкновениями и р…"  },  {   "title": "Путин поздравил работников дорожного хозяйства с праздником",   "url": "https://vz.ru/news/2026/10/18/1464361.html",   "source": "Взгляд",   "topic": "Политика",   "published": 1792311111000,   "excerpt": "Президент Владимир Путин поздравил работников и ветеранов дорожного хозяйства с профессиональным праздником, отметив особую роль отрасли в укреплении экономического потенциала страны. Владимир Путин поздравил работников…"  },  {   "title": "7 человек погибли, десятки ранены при взрыве и пожаре на военной базе в Канаде",   "url": "https://life.ru/p/7-chelovek-pogibli-desyatki-raneny-pri-vzryve-i-pozhare-na-voennoy-baze-v-kanade",   "source": "Life",   "topic": "Общество",   "published": 1792311108000,   "excerpt": "Не менее семи человек погибли, десятки получили ранения при взрыве и последующем пожаре на военной базе Уэйнрайт в канадской провинции Альберта. Такие данные опубликовал телеканал Global News со ссылкой на осведомлённые…"  },  {   "title": "Лысенко выиграла золото чемпионата мира по велоспорту",   "url": "https://ria.ru/20261018/lysenko-2125216360.html",   "source": "РИА Новости",   "topic": "Политика",   "published": 1792311066000,   "excerpt": ""  },  {   "title": "В Петербурге и Ленобласти восстановили электроснабжение после налета БПЛА",   "url": "https://www.kommersant.ru/doc/9041274",   "source": "Коммерсантъ",   "topic": "Экономика",   "published": 1792310903000,   "excerpt": "Электроснабжение в двух районах Санкт-Петербурга и одном районе Ленинградской области восстановили после атаки беспилотников. Об этом сообщили в компании «Россети Ленэнерго», передает ТАСС."  },  {   "title": "Ян завершил подготовку к третьему бою с Двалишвили: своё не отдам",   "url": "https://russian.rt.com/sport/news/1696185-yan-podgotovka-boy-dvalishvili?utm_source=rss&utm_medium=rss&utm_campaign=RSS",   "source": "RT",   "topic": "Мир",   "published": 1792310874000,   "excerpt": "Чемпион UFC в легчайшем весе россиянин Пётр Ян рассказал, что завершил подготовку к третьему поединку с грузином Мерабом Двалишвили. Читать далее"  },  {   "title": "Юрист Свечникова рассказала, как распознать битый автомобиль перед покупкой",   "url": "https://russian.rt.com/russia/news/1696174-avtomobil-yurist-pokupka?utm_source=rss&utm_medium=rss&utm_campaign=RSS",   "source": "RT",   "topic": "Мир",   "published": 1792310863000,   "excerpt": "Ассистент кафедры государственного и муниципального управления РЭУ имени Г. В. Плеханова Софья Свечникова перечислила в беседе с RT признаки, по которым покупатель может определить, что автомобиль ранее попадал в ДТП и…"  },  {   "title": "Что такое редкая «аллергия на холод», какие у нее симптомы и чем ее лечат",   "url": "https://www.rbc.ru/society/18/10/2026/6ace34adb75075aff9975745",   "source": "РБК",   "topic": "Экономика",   "published": 1792310841000,   "excerpt": "Холодовая крапивница — редкое заболевание, от которого чаще страдают женщины, оно может вызвать серьезные последствия для организма. Врачи накануне зимы объясняют, на что обратить внимание и как диагностируется эта боле…"  },  {   "title": "Программа \"Выбери спорт\" поможет родителям найти подходящий вид спорта для детей",   "url": "https://www.m24.ru/news/18102026/954005",   "source": "Москва 24",   "topic": "Город",   "published": 1792310820000,   "excerpt": "Программу разработал Центр спортивных инновационных технологий и подготовки сборных команд"  },  {   "title": "Во Львове прогремели взрывы на фоне воздушной тревоги",   "url": "https://vz.ru/news/2026/10/18/1464360.html",   "source": "Взгляд",   "topic": "Политика",   "published": 1792310703000,   "excerpt": "Во Львове зафиксированы взрывы, в регионе звучит сигнал воздушной тревоги. Украинский «24-й канал» сообщил о взрывах во Львове, передает РИА «Новости» . Согласно данным онлайн-карты воздушных тревог министерства цифрово…"  },  {   "title": "Две ступени долголетия: когда наука победит старость",   "url": "https://www.kp.ru/daily/277825.5/5316935/?from=twall",   "source": "Комсомольская правда",   "topic": "Общество",   "published": 1792310700000,   "excerpt": "Глава МНОИ Воронцова назвала ключевые вызовы на пути к продлению здоровой жизни"  },  {   "title": "В Литве объявляли тревогу из-за неопознанного объекта в небе",   "url": "https://www.kommersant.ru/doc/9041271",   "source": "Коммерсантъ",   "topic": "Экономика",   "published": 1792310665000,   "excerpt": "Национальный центр управления кризисными ситуациями (НЦУКС) и Вооруженные силы Литвы объявляли красный уровень воздушной тревоги с 7:05 мск до 8:00 мск в граничащих с Латвией районах. Причиной стало движение неопознанно…"  },  {   "title": "Трамп назвал свое решение по приостановке «санкций Грэма» хорошим решением",   "url": "https://www.vedomosti.ru/politics/news/2026/10/18/1237961-tramp-nazval",   "source": "Ведомости",   "topic": "Экономика",   "published": 1792310564000,   "excerpt": ""  },  {   "title": "Рубио объяснил, почему США заключили сделку с Россией по дизелю",   "url": "https://www.rbc.ru/politics/18/10/2026/6ad46d42711a4d2520828195",   "source": "РБК",   "topic": "Экономика",   "published": 1792310534000,   "excerpt": "Российское дизельное топливо поступило бы на мировой рынок независимо от сделки с Вашингтоном, заявил Рубио. Москва сообщала, что первые поставки США могут начаться уже в конце октября"  },  {   "title": "Путин поздравил с праздником работников и ветеранов дорожного хозяйства",   "url": "https://tvzvezda.ru/news/20261018111-C6cKk.html",   "source": "Звезда",   "topic": "Политика",   "published": 1792310513000,   "excerpt": "Президент России Владимир Путин поздравил работников и ветеранов дорожного хозяйства с профессиональным праздником. Телеграмма главы государства опубликована на сайте Кремля. «Дорожному хозяйству принадлежит особая роль…"  },  {   "title": "Трамп взял паузу на 60 дней для изучения последствий санкций против РФ",   "url": "https://iz.ru/2186204/2026-10-18/tramp-vzial-pauzu-na-60-dnei-dlia-izucheniia-posledstvii-sanktcii-protiv-rf",   "source": "Известия",   "topic": "Политика",   "published": 1792310466000,   "excerpt": "Президенту США Дональду Трампу потребуется до 60 дней для оценки последствий возможного введения санкций и пошлин против России. Об этом заявил госсекретарь США Марко Рубио, передает 18 октября агентство Reuters ."  },  {   "title": "В МВД назвали опасность взлома аккаунта на \"Госуслугах\"",   "url": "https://www.m24.ru/news/18102026/954004",   "source": "Москва 24",   "topic": "Город",   "published": 1792310460000,   "excerpt": "Мошенники способны оформить от имени жертвы кредит или микрозайм"  },  {   "title": "Актриса Федосеева-Шукшина продолжает лечение в больнице",   "url": "https://russian.rt.com/nopolitics/news/1696181-aktrisa-fedoseeva-shukshina-lechenie?utm_source=rss&utm_medium=rss&utm_campaign=RSS",   "source": "RT",   "topic": "Мир",   "published": 1792310356000,   "excerpt": "Народная артистка РСФСР Лидия Федосеева-Шукшина продолжает проходить курс лечения в больнице, рассказала её дочь Ольга Шукшина. Читать далее"  },  {   "title": "В Ленобласти после атаки БПЛА пострадали десять человек",   "url": "https://www.rbc.ru/rbcfreenews/6ad47ac4c8791ef4fc84935b",   "source": "РБК",   "topic": "Экономика",   "published": 1792310210000,   "excerpt": "Во Всеволожске Ленинградской области после атаки украинских беспилотников врачи осмотрели десять человек, сообщили РБК в пресс-службе комздрава региона."  },  {   "title": "Спецпредставитель президента Дмитриев призвал Россию и США работать сообща",   "url": "https://vz.ru/news/2026/10/18/1464359.html",   "source": "Взгляд",   "topic": "Политика",   "published": 1792310170000,   "excerpt": "Спецпредставитель президента России по инвестиционно-экономическому сотрудничеству с зарубежными странами и глава РФПИ Кирилл Дмитриев заявил, что Москве и Вашингтону следует объединить усилия для обеспечения глобальног…"  },  {   "title": "Сбиты высотные беспилотники ВСУ, направляемые вглубь территории России",   "url": "https://iz.ru/2186202/video/sbity-vysotnye-bespilotniki-vsu-napravliaemye-vglub-territorii-rossii",   "source": "Известия",   "topic": "Политика",   "published": 1792309984000,   "excerpt": ""  },  {   "title": "Число пострадавших в Ленобласти выросло до 10 человек",   "url": "https://www.bfm.ru/news/621210",   "source": "BFM.ru",   "topic": "Экономика",   "published": 1792309850000,   "excerpt": "В больницу доставили пятерых детей и двух женщин, еще три человека от госпитализации отказались"  },  {   "title": "В аэропорту Пулково пассажиров укрыли в безопасных местах во время налета БПЛА",   "url": "https://iz.ru/2186201/v-aeroportu-pulkovo-passazhirov-ukryli-v-bezopasnykh-mestakh-vo-vremia-naleta-bpla-izi",   "source": "Известия",   "topic": "Политика",   "published": 1792309821000,   "excerpt": "Пассажиров аэропорта Пулково укрыли в безопасных местах во время атаки беспилотников. В зоне регистрации также наблюдаются скопления туристов в связи с подготовкой к возобновлению обслуживания рейсов. Об этом сообщили 1…"  },  {   "title": "Улицу Маршала Сергеева благоустроили в районе Кунцево",   "url": "https://www.m24.ru/news/18102026/954003",   "source": "Москва 24",   "topic": "Город",   "published": 1792309680000,   "excerpt": "Работы решено было провести из-за износа дорожного покрытия"  },  {   "title": "ВС РФ нанесли удар по складам ВСУ в Волынской области",   "url": "https://tvzvezda.ru/news/202610181045-DLLRB.html",   "source": "Звезда",   "topic": "Политика",   "published": 1792309590000,   "excerpt": "ВС РФ нанесли удар по складским и производственным помещениям предприятия «Полко» в населенном пункте Маневичи Волынской области, которые использовались в интересах ВСУ. Об этом заявил источник Zvezdanews. Отмечается, ч…"  },  {   "title": "В МВД назвали фразы, которых следует избегать в разговоре с неизвестными",   "url": "https://www.vedomosti.ru/society/news/2026/10/18/1237960-mvd-nazvali-frazi",   "source": "Ведомости",   "topic": "Экономика",   "published": 1792309504000,   "excerpt": ""  },  {   "title": "В Псковской области нашли останки почти 250 жертв нацистского концлагеря",   "url": "https://www.kommersant.ru/doc/9041268",   "source": "Коммерсантъ",   "topic": "Экономика",   "published": 1792309462000,   "excerpt": "Участники поисковой экспедиции обнаружили останки почти 250 человек в Дновском районе Псковской области. В годы Великой Отечественной войны на этой территории располагался нацистский концлагерь, сообщил губернатор регио…"  },  {   "title": "I Am Jane Doe: скандал в Корнеллском университете вызвал новую волну Me Too",   "url": "https://www.bfm.ru/news/621171",   "source": "BFM.ru",   "topic": "Экономика",   "published": 1792309242000,   "excerpt": "Поводом стал иск бывшей студентки вуза, обвинившей семерых мужчин в сексуальном насилии. В ответ на критику девушки сотни пользовательниц соцсетей начали рассказывать собственные истории под лозунгом «Я Джейн Доу»"  },  {   "title": "В Петербурге в результате атаки БПЛА погиб житель Невского района",   "url": "https://www.bfm.ru/news/621209",   "source": "BFM.ru",   "topic": "Экономика",   "published": 1792308935000,   "excerpt": "Он погиб в результате попадания осколков в автомобиль"  },  {   "title": "Собянин: за сутки на подлете к Москве сбили 127 БПЛА",   "url": "https://www.vedomosti.ru/politics/news/2026/10/18/1237959-sobyanin-za-sutki",   "source": "Ведомости",   "topic": "Экономика",   "published": 1792308685000,   "excerpt": ""  },  {   "title": "Зеленский побежал не туда: кто убедил Трампа, что киевский режим – людоедский",   "url": "https://www.kp.ru/daily/277825.5/5316911/?from=twall",   "source": "Комсомольская правда",   "topic": "Общество",   "published": 1792307880000,   "excerpt": "Политический философ Казаков: Трамп изменил отношение к Зеленскому из-за Мендель"  },  {   "title": "ВКС накрыли ФАБами украинскую мотопехоту у Гонтаровки",   "url": "https://tvzvezda.ru/news/202610181017-uM1Fi.html",   "source": "Звезда",   "topic": "Политика",   "published": 1792307863000,   "excerpt": "Экипажи ВКС России накрыли авиабомбами ФАБ-500 подразделение 57-й отдельной мотопехотной бригады ВСУ. Кадры боевой работы наших летчиков продемонстрировало Минобороны России. В сообщении МО РФ уточняется, что пункт врем…"  },  {   "title": "Дроны атаковали Петербург и Ленобласть. Под удар попали жилые дома, нефтяной терминал и дата-центр",   "url": "https://www.gazeta.ru/social/2026/10/18/long-23721103.shtml",   "source": "Газета.Ru · Общество",   "topic": "Общество",   "published": 1792307598000,   "excerpt": "ВСУ ночью совершили массированную атаку дронов на Санкт-Петербург и Ленинградскую область. В результате один человек погиб, девять (включая троих детей) пострадали. В городе повреждены нефтяной терминал и склад Ozon. В…"  },  {   "title": "«Торт огромный, как твое сердце»: Николай Басков отметил юбилей грандиозным банкетом с Собчак и Лепсом",   "url": "https://www.kp.ru/daily/277825.5/5316910/?from=twall",   "source": "Комсомольская правда",   "topic": "Общество",   "published": 1792307100000,   "excerpt": "На празднике у артиста пели его коллеги"  },  {   "title": "Принял ребенка от другого, терпел романы на стороне: история любви Николая Рыбникова и Аллы Ларионовой",   "url": "https://www.gazeta.ru/culture/long-23702179/istoriya-lyubvi-nikolaya-rybnikova-i-ally-larionovoj.shtml",   "source": "Газета.Ru · Культура",   "topic": "Культура",   "published": 1792299632000,   "excerpt": "История одной из самых известных актерских пар советского кино началась с безответной любви — звезда фильма \"Весна на Заречной улице\" еще в юности влюбился в красавицу-москвичку и не смог перебороть в себе это чувство…"  },  {   "title": "\"Флаг упал на штыки русских солдат\": как Аляску передавали США",   "url": "https://www.gazeta.ru/social/2026/10/18/long-23715355.shtml",   "source": "Газета.Ru · Общество",   "topic": "Общество",   "published": 1792299602000,   "excerpt": "Русскую Америку передали США намного позже, чем страны подписали соответствующий договор о продаже — лишь спустя более полугода на Аляске спустили российский флаг и подняли американский. Церемония прошла 18 октября 1867…"  },  {   "title": "Карта масонства России. Сколько тайных организаций работает в стране",   "url": "https://www.gazeta.ru/social/2026/10/18/long-23715313.shtml",   "source": "Газета.Ru · Общество",   "topic": "Общество",   "published": 1792299552000,   "excerpt": "Масонство — тайное движение со своей идеологией и ритуалами. Масоны не относят себя к политическим или религиозным силам. Как ранее рассказывал \"Газете.Ru\" главный масон России Андрей Богданов, в крупнейшем в стране офи…"  },  {   "title": "\"Готовился к бою с Кличко\". Умер боксер Денис Бойцов, известный как \"Русский Тайсон\"",   "url": "https://www.gazeta.ru/sport/2026/10/17/long-23719765.shtml",   "source": "Газета.Ru · Спорт",   "topic": "Спорт",   "published": 1792256707000,   "excerpt": "Боксер-тяжеловес Денис Бойцов ушел из жизни в возрасте 40 лет. По словам его отца, причиной \"мгновенной смерти\" стал оторвавшийся тромб. Перед этим спортсмен перенес операцию на почках. Бойцов получил известность как \"Р…"  },  {   "title": "Овечкин отдал важную голевую передачу: \"Вашингтон\" разнес \"Нью-Джерси\"",   "url": "https://www.gazeta.ru/sport/matches/hockey/nhl/2026-2027/23485861.shtml",   "source": "Газета.Ru · Спорт",   "topic": "Спорт",   "published": 1792256400000,   "excerpt": "\"Вашингтон Кэпиталз\" обыграл \"Нью-Джерси Дэвилз\" в матче регулярного чемпионата НХЛ, а капитан \"столичных\" Александр Овечкин отдал голевую передачу. Теперь на счету российского нападающего 760 ассистов в составе \"Вашинг…"  },  {   "title": "Зеленский допустил встречу с Путиным. Где она может пройти?",   "url": "https://www.gazeta.ru/politics/2026/10/17/long-23719585.shtml",   "source": "Газета.Ru · Политика",   "topic": "Политика",   "published": 1792255382000,   "excerpt": "Трехсторонняя встреча Владимира Путина, Владимира Зеленского и Дональда Трампа может пройти в США или одной из стран Ближнего Востока. По словам президента Украины, у Вашингтона есть предложение о проведении таких перег…"  },  {   "title": "Ничейная феерия в Москве: \"Локомотив\" и \"Краснодар\" забили шесть мячей на двоих",   "url": "https://www.gazeta.ru/sport/online/rfc/2026-2027/23433619.shtml",   "source": "Газета.Ru · Спорт",   "topic": "Спорт",   "published": 1792254600000,   "excerpt": "Московский \"Локомотив\" на своем поле сыграл вничью с \"Краснодаром\" в рамках 11-го тура Российской премьер-лиги со счетом 3:3. \"Краснодар\" поднялся на третью строчку в турнирной таблице, а \"Локомотив\" остался в зоне стык…"  },  {   "title": "\"Мэр или мародер?\": киевляне потребовали отставки Кличко",   "url": "https://www.gazeta.ru/politics/2026/10/17/long-23719237.shtml",   "source": "Газета.Ru · Политика",   "topic": "Политика",   "published": 1792248922000,   "excerpt": "17 октября киевляне вышли к городской администрации с требованием к мэру Виталию Кличко уйти в отставку. Протестующие принесли плакаты с надписями \"Мэр или мародер?\" и \"Кличко — черт!\", а также скандировали лозунг \"Киев…"  },  {   "title": "Влюбила в себя Человека-паука и покорила Голливуд: биография Зендаи и скандалы с ее участием",   "url": "https://www.gazeta.ru/culture/2026/10/15/23709787.shtml",   "source": "Газета.Ru · Культура",   "topic": "Культура",   "published": 1792216532000,   "excerpt": "В октябре 2026 года Зендая оказалась в центре скандала: актрису обвинили в неуважении первой леди Франции Брижит Макрон. И это при том, что годами Зендаю считали одной из самых сдержанных звезд Голливуда. Что стало пово…"  },  {   "title": "Типов диабета больше, чем два. Что такое LADA-диабет и есть ли лекарства от него?",   "url": "https://www.gazeta.ru/science/2026/10/17/long-23702023.shtml",   "source": "Газета.Ru · Наука",   "topic": "Наука",   "published": 1792216445000,   "excerpt": "Сахарный диабет обычно делят на два типа: 1-й и 2-й. Но в мире диабетологии выделяют четыре формы болезни. Одна из них — LADA-диабет — латентный аутоиммунный диабет у взрослых. По сути это первый тип диабета, который ра…"  },  {   "title": "Автомобиль Tesla впервые взлетел на реактивных двигателях. Появится ли он на дорогах России?",   "url": "https://www.gazeta.ru/auto/2026/10/16/long-23713003.shtml",   "source": "Газета.Ru · Авто",   "topic": "Авто",   "published": 1792144790000,   "excerpt": "Tesla представила летающий автомобиль. На полигоне в Техасе американский автопроизводитель показал возрожденную модель Roadster, снабженную ракетными ускорителями от SpaceX. О том, какими технологиями удивляет новое тво…"  },  {   "title": "Гаишникам разрешили отнимать права у водителей. Кто в зоне риска",   "url": "https://www.gazeta.ru/auto/2026/10/16/long-23712703.shtml",   "source": "Газета.Ru · Авто",   "topic": "Авто",   "published": 1792140914000,   "excerpt": "Сотрудники Госавтоинспекции с марта 2027 года получат право отнимать у водителей права в определенных случаях. В настоящее время решение о лишении гражданина специального права управления транспортными средствами приним…"  },  {   "title": "Уход из Большого, роман с Волочковой и скандальная Ibiza: как Николай Басков стал звездой",   "url": "https://www.gazeta.ru/culture/2026/10/15/long-23706097.shtml",   "source": "Газета.Ru · Культура",   "topic": "Культура",   "published": 1792073856000,   "excerpt": "15 октября Николаю Баскову исполняется 50 лет. За четверть века карьеры он успел исполнить партию Ленского на сцене Большого театра, прославиться хитами \"Шарманка\" и \"Натуральный блондин\" -- и вместе с Филиппом Киркоров…"  },  {   "title": "Клетки ведут себя как паразиты. Существует ли заразный рак?",   "url": "https://www.gazeta.ru/science/2026/10/14/long-23695669.shtml",   "source": "Газета.Ru · Наука",   "topic": "Наука",   "published": 1791954117000,   "excerpt": "Все знают: раком невозможно заразиться, ведь это не инфекционное заболевание. Но что, если это не совсем так? Дело в том, что у животных может возникать трансмиссивный рак — редкое явление, при котором сами раковые клет…"  } ]};</script>
 <script>const ARTICLES = [
@@ -1042,6 +1111,9 @@ const els = {
   channels: $("#channels"),
   reader: $("#reader"),
   readerBody: $("#readerBody"),
+  tabbar: $("#tabbar"),
+  searchForm: $("#searchForm"),
+  searchToggle: $("#searchToggle"),
   themeBtn: $("#themeToggle"),
   themeLabel: $("#themeLabel")
 };
@@ -1208,7 +1280,7 @@ function render() {
 }
 
 function syncSide() {
-  document.querySelectorAll(".railnav__btn").forEach((btn) => {
+  document.querySelectorAll(".railnav__btn, .tabbar__btn").forEach((btn) => {
     const on = btn.dataset.view === state.view;
     btn.classList.toggle("is-active", on);
     if (on) btn.setAttribute("aria-current", "page");
@@ -1354,7 +1426,7 @@ function syncReaderActions(id) {
 }
 
 function initTheme() {
-  const theme = load("lenta.theme", "light");
+  const theme = load("lenta.theme", "dark");
   const dark = theme === "dark";
   document.documentElement.dataset.theme = dark ? "dark" : "light";
   els.themeBtn.setAttribute("aria-pressed", String(dark));
@@ -1514,6 +1586,40 @@ document.querySelectorAll(".railnav__btn[data-view]").forEach((btn) => {
 
 document.querySelectorAll('.railnav__btn[data-action="search"]').forEach((btn) => {
   btn.addEventListener("click", () => els.search.focus());
+});
+
+document.querySelectorAll(".tabbar__btn[data-view]").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    setView(btn.dataset.view);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+
+let lastScrollY = window.scrollY;
+window.addEventListener("scroll", () => {
+  if (!els.tabbar) return;
+  const y = window.scrollY;
+  const down = y > lastScrollY && y > 80;
+  els.tabbar.classList.toggle("is-hidden", down);
+  lastScrollY = y;
+}, { passive: true });
+
+function setSearchOpen(open) {
+  if (!els.searchForm) return;
+  els.searchForm.classList.toggle("is-open", open);
+  if (els.searchToggle) els.searchToggle.setAttribute("aria-expanded", String(open));
+  if (open) els.search.focus();
+  else els.search.blur();
+}
+
+if (els.searchToggle) {
+  els.searchToggle.addEventListener("click", () => {
+    setSearchOpen(!els.searchForm.classList.contains("is-open"));
+  });
+}
+
+els.search.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") setSearchOpen(false);
 });
 
 els.search.addEventListener("input", (e) => applySearch(e.target.value));
