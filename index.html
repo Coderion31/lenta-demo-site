@@ -131,7 +131,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 .search {
   position: relative;
   flex: 1 1 auto;
-  max-width: 720px;
+  max-width: 620px;
   margin: 0 auto;
 }
 .search__icon {
@@ -537,18 +537,6 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 .channel__btn:hover { background: var(--surface-2); }
 .channel__btn.is-on { background: var(--ink); color: var(--surface); border-color: var(--ink); }
 
-/* ---------- footer ---------- */
-
-.foot {
-  max-width: 1360px;
-  margin: 0 auto;
-  padding: 0 24px 46px;
-  color: var(--muted);
-  font-size: 12.5px;
-  display: flex; flex-wrap: wrap; gap: 6px 18px; justify-content: space-between;
-}
-.foot__muted { opacity: .8; }
-
 /* ---------- reader ---------- */
 
 .reader { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 24px; }
@@ -623,7 +611,6 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   .card--hero .card__inner { padding: 18px 18px 16px; }
   .card--hero .card__title { font-size: 20px; }
   .feed__head h1 { font-size: 23px; }
-  .foot { padding: 0 16px 34px; }
   .reader { padding: 12px; }
   .reader__body { padding: 16px 18px 26px; }
   .reader__title { font-size: 24px; }
@@ -752,10 +739,6 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   </aside>
 </main>
 
-<footer class="foot">
-  <p>Демо-макет новостной ленты. Все публикации, каналы и показатели вымышлены.</p>
-  <p class="foot__muted">Сделано как локальная HTML-страница · <span id="year">2026</span></p>
-</footer>
 
 <div class="reader" id="reader" hidden>
   <div class="reader__backdrop" data-close="1"></div>
@@ -1384,6 +1367,7 @@ function initTheme() {
 }
 
 const NEWS_URL = "data/news.json";
+const NEWS_URL_REMOTE = "https://coderion31.github.io/lenta-demo-site/data/news.json";
 const NEWS_KEY = "shum.news.v3";
 const REFRESH_MS = 600000;
 const SOURCE_COLORS = ["#2f6bff", "#8a3fb5", "#0f7f9c", "#c81f45", "#e0532b", "#13883f", "#3f4b5b", "#a8541b"];
@@ -1448,15 +1432,37 @@ function setFeedStatus(text, kind) {
   els.feedStatus.dataset.kind = kind || "";
 }
 
+async function fetchNewsData() {
+  const urls = location.protocol === "http:" || location.protocol === "https:"
+    ? [NEWS_URL, NEWS_URL_REMOTE]
+    : [NEWS_URL_REMOTE, NEWS_URL];
+  let lastError = null;
+  for (const url of urls) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 12000);
+    try {
+      const res = await fetch(url + (url.indexOf("?") === -1 ? "?" : "&") + "t=" + Date.now(), {
+        cache: "no-store",
+        signal: ctrl.signal
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+      if (data && Array.isArray(data.items) && data.items.length) return data;
+      throw new Error("пустой ответ");
+    } catch (e) {
+      lastError = e;
+    } finally {
+      clearTimeout(timer);
+    }
+  }
+  throw lastError || new Error("нет данных");
+}
+
 async function loadNews() {
   if (els.refreshNews) els.refreshNews.disabled = true;
   setFeedStatus("Обновляю ленту…", "loading");
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 12000);
   try {
-    const res = await fetch(NEWS_URL + "?t=" + Date.now(), { cache: "no-store", signal: ctrl.signal });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const data = await res.json();
+    const data = await fetchNewsData();
     const items = (data.items || []).map(mapItem).filter((a) => a.title && /^https?:\/\//.test(a.url));
     if (items.length < 5) throw new Error("мало материалов");
     items.sort((a, b) => b.published - a.published);
@@ -1475,7 +1481,6 @@ async function loadNews() {
     }
     setFeedStatus("Нет связи с лентой — показана офлайн-подборка", "offline");
   } finally {
-    clearTimeout(timer);
     if (els.refreshNews) els.refreshNews.disabled = false;
   }
 }
@@ -1573,8 +1578,6 @@ $("#logoLink").addEventListener("click", (e) => {
   setView("home");
   window.scrollTo({ top: 0, behavior: "smooth" });
 });
-
-$("#year").textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
