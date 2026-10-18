@@ -135,24 +135,30 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 .news__title:hover { color: var(--ink-2); }
 
-/* ---------- разделитель ---------- */
+/* ---------- кнопка «Ещё 5» ---------- */
 
-.divider {
+.more {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin: 16px 6px;
+  width: 100%;
+  margin: 6px auto 0;
+  max-width: 460px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: none;
   color: var(--muted);
-  font-size: 12.5px;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
 }
 
-.divider::before,
-.divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
+.more:hover { background: var(--surface); color: var(--ink); }
+.more:active { background: var(--surface); color: var(--ink); transform: scale(.99); }
+
+.more[hidden] { display: none; }
 
 /* ---------- пусто ---------- */
 
@@ -174,8 +180,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 
 <main class="page">
   <ul class="news" id="news"></ul>
-  <p class="divider" id="divider">Ещё 5 новостей</p>
-  <ul class="news news--more" id="newsMore"></ul>
+  <button class="more" id="more" type="button">Ещё 5 новостей</button>
   <p class="empty" id="empty" hidden>Ничего не нашлось</p>
 </main>
 
@@ -192,45 +197,42 @@ ul { list-style: none; margin: 0; padding: 0; }
   { t: "Украинский беспилотник влетел в квартиру дома в Энергодаре", l: "https://dzen.ru/news/story/b1ae1c5b-04ab-5ea6-9af8-5ec9a15db65a", i: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAoACgDASIAAhEBAxEB/8QAGwAAAgIDAQAAAAAAAAAAAAAAAAgCBgEDBQT/xAAwEAABBAECBAIIBwAAAAAAAAACAQMEBQAGEQcTIZESMQgWQVJhcZXTMkJEgZKX0v/EABkBAAMBAQEAAAAAAAAAAAAAAAQFBwIDBv/EACYRAAEDAwMDBQEAAAAAAAAAAAEAAhEDBBIhMUEFE4EGImFxkcH/2gAMAwEAAhEDEQA/AFRFc3ABqm6ASp8s84Ljs02r39KcG664kz7pK6n0hRvBDrpLbCm5JfktGSkQFv0bb7fHLpd9WfYhmDMi4xEx8Dg8lLG08pkpMxbc9wuy5JEVPNFT54zY+k7Ur+n1z9aY+zljCVR8a9DC4+3OkMzJEmujuWYtHMrJzUU5TZtPtgPMZMAITbLdd1TbbD6fqW7tIfdW2LOTlMeI/o/YBz2Wu0a7VKGmGYFcMozHSEHC5oLjgV8ijrtH0N1qSFGerIeh6RHnpGn2rMGfG/LEd0Mk8G5bJ0Rd/bttiegvXHeotIu6q4N11PMrrwqy50fRshMrY7byg5GfkumKoRpt0Nv+XwyFdZrNa2lmYE6/Wkx4lM6Y3VTTiNwU9g6f/ruP/vLTpS2p9VQH10vewzrnhOlhnEqEr/V+XLFQB0ow7i4jypy+ai+IVXZE6kqVVPRjok/Pr/6TH+5neqdP6Z4L6efemlaQa850axmO2psBMsjikrkeLGjtkSonN2I3C2TZFTqnUR6j+nvZja1HOqEiAQPPAMxsBvsQWkrQDwfcNEpdlDkVtnKrpYcuTFeNl0d/wmJKKp3RcMneWTtveT7aQIi9NkuSHEHyQjJSXb91wy221V3bGe/KWka6LgJm0HDRNvEXfDDJnbnVGlbBcP3i75NCVfNVXDDPQ2hXEqYrhhhj+k44rkV//9k=" }
 ];
 
-const first = NEWS.slice(0, 5);
-const second = NEWS.slice(5);
-
-const list1 = document.getElementById("news");
-const list2 = document.getElementById("newsMore");
-const divider = document.getElementById("divider");
+const list = document.getElementById("news");
+const moreBtn = document.getElementById("more");
 const empty = document.getElementById("empty");
 const input = document.getElementById("searchInput");
+
+let expanded = false;
 
 function itemHTML(n) {
   return (
     '<li><a class="news__item" href="' + n.l + '" target="_blank" rel="noopener noreferrer">' +
-      '<img class="news__logo" src="' + n.i + '" alt="" loading="lazy">' +
+      '<img class="news__logo" src="' + n.i + '" alt="">' +
       '<span class="news__title">' + n.t + "</span>" +
     "</a></li>"
   );
 }
 
-function renderAll() {
-  list1.innerHTML = first.map(itemHTML).join("");
-  list2.innerHTML = second.map(itemHTML).join("");
-  divider.hidden = false;
-  empty.hidden = true;
+function visible() {
+  return expanded ? NEWS : NEWS.slice(0, 5);
 }
 
-function renderFilter(q) {
-  const needle = q.trim().toLowerCase();
-  if (!needle) { renderAll(); return; }
-  const hit1 = first.filter((n) => n.t.toLowerCase().includes(needle));
-  const hit2 = second.filter((n) => n.t.toLowerCase().includes(needle));
-  list1.innerHTML = hit1.map(itemHTML).join("");
-  list2.innerHTML = hit2.map(itemHTML).join("");
-  divider.hidden = true;
-  empty.hidden = hit1.length + hit2.length > 0;
+function render() {
+  const needle = input.value.trim().toLowerCase();
+  const source = needle ? NEWS.filter((n) => n.t.toLowerCase().includes(needle)) : visible();
+  list.innerHTML = source.map(itemHTML).join("");
+  empty.hidden = source.length > 0;
+  moreBtn.hidden = expanded || needle.length > 0;
 }
 
-renderAll();
+moreBtn.addEventListener("click", () => {
+  expanded = true;
+  render();
+});
 
-input.addEventListener("input", () => renderFilter(input.value));
-document.getElementById("searchForm").addEventListener("submit", (e) => e.preventDefault());</script>
+input.addEventListener("input", render);
+document.getElementById("searchForm").addEventListener("submit", (e) => e.preventDefault());
+
+render();</script>
 </body>
 </html>
