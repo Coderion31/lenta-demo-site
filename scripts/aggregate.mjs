@@ -6,26 +6,25 @@ const FEEDS = [
   { name: "РИА Новости", topic: "Политика", url: "https://ria.ru/export/rss2/archive/index.xml" },
   { name: "ТАСС", topic: "Политика", url: "https://tass.ru/rss/v2.xml" },
   { name: "РБК", topic: "Экономика", url: "https://rssexport.rbc.ru/rbcnews/news/30/full.rss" },
-  { name: "Лента.ру", topic: "Общество", url: "https://lenta.ru/rss/news" },
   { name: "Известия", topic: "Политика", url: "https://iz.ru/rss" },
   { name: "Коммерсантъ", topic: "Экономика", url: "https://www.kommersant.ru/rss/news.xml" },
   { name: "Ведомости", topic: "Экономика", url: "https://www.vedomosti.ru/rss/news" },
   { name: "RT", topic: "Мир", url: "https://russian.rt.com/rss" },
   { name: "Взгляд", topic: "Политика", url: "https://vz.ru/rss.xml" },
   { name: "МК", topic: "Общество", url: "https://www.mk.ru/rss/index.xml" },
-  { name: "News.ru", topic: "Общество", url: "https://news.ru/rss/" },
-  { name: "BFM.ru", topic: "Экономика", url: "https://www.bfm.ru/news.rss" },
   { name: "Москва 24", topic: "Город", url: "https://www.m24.ru/rss.xml" },
+  { name: "BFM.ru", topic: "Экономика", url: "https://www.bfm.ru/news.rss" },
+  { name: "Life", topic: "Общество", url: "https://life.ru/rss" },
+  { name: "Комсомольская правда", topic: "Общество", url: "https://www.kp.ru/rss/allsections.xml" },
+  { name: "Звезда", topic: "Политика", url: "https://tvzvezda.ru/export/rss.xml" },
+  { name: "Forbes", topic: "Экономика", url: "https://www.forbes.ru/newrss.xml" },
+  { name: "Чемпионат", topic: "Спорт", url: "https://www.championat.com/rss/news/" },
   { name: "Газета.Ru · Политика", topic: "Политика", url: "https://www.gazeta.ru/export/rss/politics.xml" },
   { name: "Газета.Ru · Общество", topic: "Общество", url: "https://www.gazeta.ru/export/rss/social.xml" },
   { name: "Газета.Ru · Спорт", topic: "Спорт", url: "https://www.gazeta.ru/export/rss/sport.xml" },
   { name: "Газета.Ru · Культура", topic: "Культура", url: "https://www.gazeta.ru/export/rss/culture.xml" },
   { name: "Газета.Ru · Наука", topic: "Наука", url: "https://www.gazeta.ru/export/rss/science.xml" },
-  { name: "Газета.Ru · Авто", topic: "Авто", url: "https://www.gazeta.ru/export/rss/auto.xml" },
-  { name: "3DNews", topic: "Технологии", url: "https://3dnews.ru/news/rss/" },
-  { name: "Хабр", topic: "Технологии", url: "https://habr.com/ru/rss/news/" },
-  { name: "N+1", topic: "Наука", url: "https://nplus1.ru/rss" },
-  { name: "Афиша Daily", topic: "Культура", url: "https://daily.afisha.ru/rss/" }
+  { name: "Газета.Ru · Авто", topic: "Авто", url: "https://www.gazeta.ru/export/rss/auto.xml" }
 ];
 
 const MAX_PER_FEED = 5;
