@@ -1,0 +1,112 @@
+import { writeFile, mkdir } from "node:fs/promises";
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const FEEDS = [
+  { name: "РИА Новости", url: "https://ria.ru/export/rss2/archive/index.xml" },
+  { name: "ТАСС", url: "https://tass.ru/rss/v2.xml" },
+  { name: "РБК", url: "https://rssexport.rbc.ru/rbcnews/news/30/full.rss" },
+  { name: "Известия", url: "https://iz.ru/rss" },
+  { name: "Коммерсантъ", url: "https://www.kommersant.ru/rss/news.xml" },
+  { name: "Ведомости", url: "https://www.vedomosti.ru/rss/news" },
+  { name: "RT", url: "https://russian.rt.com/rss" },
+  { name: "Лента.ру", url: "https://lenta.ru/rss/news" },
+  { name: "Взгляд", url: "https://vz.ru/rss.xml" },
+  { name: "МК", url: "https://www.mk.ru/rss/index.xml" },
+  { name: "Москва 24", url: "https://www.m24.ru/rss.xml" },
+  { name: "BFM.ru", url: "https://www.bfm.ru/news.rss" },
+  { name: "Life", url: "https://life.ru/rss" },
+  { name: "Комсомольская правда", url: "https://www.kp.ru/rss/allsections.xml" },
+  { name: "Звезда", url: "https://tvzvezda.ru/export/rss.xml" },
+  { name: "Forbes", url: "https://www.forbes.ru/newrss.xml" },
+  { name: "Чемпионат", url: "https://www.championat.com/rss/news/" }
+];
+
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126 Safari/537.36";
+const ENTITIES = { nbsp: " ", amp: "&", lt: "<", gt: ">", quot: "\"", apos: "'", laquo: "«", raquo: "»", mdash: "—", ndash: "–", hellip: "…" };
+
+function decodeEntities(s) {
+  return String(s).replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (m, code) => {
+    if (code[0] === "#") {
+      const n = code[1] === "x" || code[1] === "X" ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10);
+      return Number.isFinite(n) ? String.fromCodePoint(n) : m;
+    }
+    return ENTITIES[code.toLowerCase()] === undefined ? m : ENTITIES[code.toLowerCase()];
+  });
+}
+
+function cleanText(s) {
+  return decodeEntities(String(s || "").replace(/<!\[CDATA\[|\]\]>/g, ""))
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function tag(xml, name) {
+  const m = new RegExp("<" + name + "\\b[^>]*>([\\s\\S]*?)</" + name + ">", "i").exec(xml);
+  return m ? m[1] : "";
+}
+
+function decodeBody(buf, contentType) {
+  const m = /charset=([^;]+)/i.exec(contentType || "");
+  let charset = (m ? m[1] : "utf-8").trim().toLowerCase();
+  if (charset === "cp1251" || charset === "windows-1251" || charset === "win-1251") charset = "windows-1251";
+  try {
+    return new TextDecoder(charset).decode(buf);
+  } catch {
+    return new TextDecoder("utf-8").decode(buf);
+  }
+}
+
+async function loadFeed(feed) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 20000);
+  try {
+    const res = await fetch(feed.url, {
+      signal: ctrl.signal,
+      redirect: "follow",
+      headers: { "User-Agent": UA, "Accept": "application/rss+xml, application/xml, text/xml, */*" }
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const buf = await res.arrayBuffer();
+    const xml = decodeBody(buf, res.headers.get("content-type"));
+    const items = [...xml.matchAll(/<item\b[^>]*>([\s\S]*?)<\/item>/gi)].map((m) => m[1]);
+    return items.slice(0, 4).map((raw) => {
+      const title = cleanText(tag(raw, "title"));
+      const link = cleanText(tag(raw, "link") || tag(raw, "guid"));
+      const dateRaw = cleanText(tag(raw, "pubDate") || tag(raw, "dc:date"));
+      const date = new Date(dateRaw);
+      if (!title || !/^https?:\/\//i.test(link)) return null;
+      return {
+        title,
+        url: link,
+        source: feed.name,
+        published: Number.isFinite(date.getTime()) ? date.getTime() : Date.now()
+      };
+    }).filter(Boolean);
+  } catch (e) {
+    console.error("fail " + feed.name + ": " + e.message);
+    return [];
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+const results = await Promise.all(FEEDS.map(loadFeed));
+const seen = new Set();
+const items = [];
+for (const list of results) {
+  for (const item of list) {
+    const key = item.url.replace(/[#?].*$/, "").toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    items.push(item);
+  }
+}
+items.sort((a, b) => b.published - a.published);
+
+const out = { updatedAt: new Date().toISOString(), items: items.slice(0, 10) };
+const target = fileURLToPath(new URL("../data/news.json", import.meta.url));
+await mkdir(dirname(target), { recursive: true });
+await writeFile(target, JSON.stringify(out, null, 1), "utf8");
+console.log("items: " + out.items.length);

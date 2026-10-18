@@ -8,11 +8,13 @@
 <style>:root {
   --bg: #121316;
   --surface: #1b1d22;
+  --surface-2: #202329;
   --ink: #f1f2f4;
   --ink-2: #c9ccd3;
   --muted: #9aa0aa;
-  --line: rgba(255, 255, 255, .10);
+  --line: rgba(255, 255, 255, .07);
   --accent: #8a7cf0;
+  --radius: 12px;
   --font: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
@@ -45,7 +47,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 .top__inner {
-  max-width: 860px;
+  max-width: 620px;
   margin: 0 auto;
   height: 64px;
   padding: 0 16px;
@@ -57,8 +59,6 @@ ul { list-style: none; margin: 0; padding: 0; }
 .search {
   position: relative;
   width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
 }
 
 .search__icon {
@@ -90,74 +90,95 @@ ul { list-style: none; margin: 0; padding: 0; }
 }
 
 .search input::placeholder { color: var(--muted); }
-
-.search input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
+.search input:focus { outline: none; border-color: var(--accent); }
 
 /* ---------- лента ---------- */
 
 .page {
-  max-width: 860px;
+  max-width: 620px;
   margin: 0 auto;
-  padding: 12px 16px 60px;
+  padding: 16px 16px 60px;
 }
 
-.news { display: flex; flex-direction: column; max-width: 460px; margin: 0 auto; }
+.status {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 0 6px 10px;
+}
+
+.news {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 .news__item {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 4px;
-  border-bottom: 1px solid var(--line);
+  gap: 12px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
   text-decoration: none;
-  transition: background .15s ease;
-  }
+  transition: background .15s ease, border-color .15s ease;
+}
 
-.news__item:hover { background: var(--surface); }
+.news__item:hover { background: var(--surface-2); border-color: var(--line); }
 
 .news__logo {
-  width: 20px;
-  height: 20px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  object-fit: cover;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
   flex: none;
-  }
-  
-  .news__title {
-  font-size: 14.5px;
+  user-select: none;
+}
+
+.news__title {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
   font-weight: 550;
-  line-height: 1.3;
+  line-height: 1.35;
   letter-spacing: -.01em;
-  }
+}
 
-.news__title:hover { color: var(--ink-2); }
+.news__source {
+  flex: none;
+  color: var(--muted);
+  font-size: 12px;
+  white-space: nowrap;
+}
 
-/* ---------- кнопка «Ещё 5» ---------- */
+/* ---------- нажимной текст «Ещё 5» ---------- */
 
 .more {
   display: flex;
   align-items: center;
   gap: 14px;
-  width: 100%;
-  margin: 6px auto 0;
-  max-width: 460px;
-  padding: 10px 12px;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: none;
+  margin: 18px 6px 0;
   color: var(--muted);
-  font: inherit;
   font-size: 14px;
   cursor: pointer;
-  transition: background .15s ease, color .15s ease;
+  user-select: none;
+  transition: color .15s ease;
 }
 
-.more:hover { background: var(--surface); color: var(--ink); }
-.more:active { background: var(--surface); color: var(--ink); transform: scale(.99); }
+.more::before,
+.more::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--line);
+}
 
+.more:hover { color: var(--ink); }
+.more:active { color: var(--accent); }
 .more[hidden] { display: none; }
 
 /* ---------- пусто ---------- */
@@ -179,60 +200,126 @@ ul { list-style: none; margin: 0; padding: 0; }
 </header>
 
 <main class="page">
+  <p class="status" id="status">Загружаю новости…</p>
   <ul class="news" id="news"></ul>
-  <button class="more" id="more" type="button">Ещё 5 новостей</button>
+  <p class="more" id="more" role="button" tabindex="0">Ещё 5 новостей</p>
   <p class="empty" id="empty" hidden>Ничего не нашлось</p>
 </main>
 
-<script>const NEWS = [
-  { t: "В аэропортах Москвы задержали 103 рейса на вылет и прилёт", l: "https://dzen.ru/news/story/853150c7-d102-57ee-a1c0-325298f9f7c6", i: "data:image/jpeg;base64,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" },
-  { t: "Свыше 370 рейсов задержаны и отменены в аэропортах Москвы", l: "https://dzen.ru/news/story/e9e8d9e2-b851-5722-a29b-8bdca93a5450", i: "data:image/png;base64,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" },
-  { t: "Румынские истребители F-16 сбили два беспилотника над Чёрным морем", l: "https://dzen.ru/news/story/f43daee6-0f9e-5f8a-af94-f5852d7d672c", i: "data:image/jpeg;base64,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" },
-  { t: "Новак: первый танкер с дизелем РФ отгружен из порта Дикси", l: "https://dzen.ru/news/story/08836f9f-230f-53b8-9b9c-b25bf53a8cb5", i: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQIAHAAcAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAoACgDASIAAhEBAxEB/8QAGgAAAgMBAQAAAAAAAAAAAAAAAAgFBgcCBP/EADMQAAAFAgQDBQcFAQAAAAAAAAECAwQFABEGBxITIUFhCBQxMlEVIkJScYGCM2NzoaKx/8QAFgEBAQEAAAAAAAAAAAAAAAAAAgED/8QAIREAAgICAQQDAAAAAAAAAAAAAQIAERIxIQNBwfBRYYH/2gAMAwEAAhEDEQA/AFWMmQDia3Ea9kRFScw/IximDp+6PxKi3TE5h62Dl18K6gIx5LSrKKZE3Hj1ciKReWow2C/T1+9MRlRl66xw/fYWwtIrwuDIlUG8vLtgs6mHPxFKbkT0L5SlsIgImAKaqKybUzdiDiu5kBMq8cgOn2Ohu2/Q9oNt76aNzVfpa9VSRjZGIkFI6VYumLtLidFdMSGD7Dy6+FOmbJfs5pMzslHkeDlO5TuT4is4KYOA39/SA/jWbZsZcOsIPI/DeIpVWcwXMKd3hZlyAGdQzowXIUxw8yZuFw8oluIAUS8UAjcDj38hJ6icmiPoV5MWVdLXqHgUR50VJS0a6i5Z3Fv09t00WOisT0OURAf+UVkRU2BuWfIhXVmZEkLxX2XOyP73dlNFuuq1qcHsWdzDIOOBtp3++uu92tfd18/x0UikXJvIWWYzMasCblosRdM/iAGKNwv05D0EaYfKPMN1gx6+xhhGPXnMFyyoLzMM2G7qHc/EYpfk8dJvKYtgESiUBrUDJKHb3xBVNc3DCETHTeamc0LItyqNHpo5u4IHuiZNRjpMACHELgI8Qrz9sBNih2eZVBQCgZNZmRkBh4gqCpQLbrpA/wDdQkZn12e4o6k1HkIxlVyjupowZiOz34iBjAFh+5qy/OLMh5jF/HYrxVFLQmCYZUXMLCujWdzjwPIcxeSYczeUC3ABMJqCKWMRNTKc8zplzTmbmKCobPeP5thPc/1eis4mZF5LzLyWkFd148XO4WP8xzGEwj9LjRVdsmJ+ZEXFQJwZUyaJiAbzha1SGEJiShZUHcVIOmDkA91VuqJDB0uHLp4UUUAa1FLs+zYx4kUq5ZdDcAbGX9nNt767m3qv1vVVnXT6fcqSEo/cvnqoXFw4UE5zegXHl0oopM7NsyUBK6oQxDiQ4WEKKKKMs//Z" },
-  { t: "Второй за день нефтяной танкер подорвался на мине в Ормузском проливе", l: "https://dzen.ru/news/story/5c5f75bf-6ae7-5490-887d-00b2df92f0f4", i: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAIBAQIBAQICAgICAgICAwUDAwMDAwYEBAMFBwYHBwcGBwcICQsJCAgKCAcHCg0KCgsMDAwMBwkODw0MDgsMDAz/2wBDAQICAgMDAwYDAwYMCAcIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAz/wAARCAAoACgDAREAAhEBAxEB/8QAGgABAQACAwAAAAAAAAAAAAAACAkGBwQFCv/EADQQAAEDAgQEBAQEBwAAAAAAAAECAwQFBgcIERIACRQhEyIxQSNCUWEKFTIzFhdUgZKhov/EABkBAAMBAQEAAAAAAAAAAAAAAAUGBwMECP/EADYRAAECAwYEAgkDBQAAAAAAAAECAwQFEQAGEiExQRNRcYFhkQcUIkKhscHR8BVSciMyQ5Lh/9oADAMBAAIRAxEAPwC7V94oUbD9+FEnTordVqyJJpkBToS/UVMMLfcS2n1O1tBJOmg1GvcgHrhoJ18FSEnCmmI7CpAFepNsXX0NkBRzNaDnQVtHzKTzXMYs8Gba6KzVK0bft2yLHr1zUm1qRubhOSY8bSP1Cv1yVJU5u852FSQQgacXufXHlUnlbbTaMa3XG0KWrWhOeHZNaUyzpvaeS+fxcbFLWo0ShKlBI0qBlXn38rG3lZyKrIqWOuKiH5tXvXDnDWo1yivOOqdebqEj4Rm9ydymUF1YPsVg+w4cL7JaCYKWEBLTzyUqGgwpzw9zQdrBJEVVfitVoQSOpyr2ztvXlFZ2MZLGy548XXAuC4MUJWG1Kpcil2fV5z0xC2XZSurlIPmeHhsNL0CFaaqJKVaDhZv5dyUvR8FDLQlgPKWFOJAGYT7KTonNRGufjYtd6ZxiId91KisoAokmupzPPIC1Vsh+fGyOYHgs1d1nSFsvxliNV6TIWky6PJ26ltwJOikkalDg8q09xoQpIiN5rsxkji/VYsZHNKhoocx9RqD2Je5VNWY9njM9xuD+aHe0hMyPNLlP87Gj4iypzpsbC6vLtqK0yolCaYFLjTnwPQqcK3XD9Uttj5RxepRcpIuguBSP6r6cZ/lkpA7UA6km09jZ6TOREE+w2cPbQnvmfK3V3hbMjk7c06lXi7EFawju56RMp0yMjqItXt+oa+M0gjyrcYS4k7B+oNtkdnAeNod5N67tqhAcMS2ACDkUuI0J3AVTXap3Fs3GzKJmHiKtKqQdQUq17j7c7ZPWMG7j5PmaWFjdYNNbxMy23vHdaMqAOqiu0SWoKXCk/KhbYCS24v4a9gSoglaRxomEPeqWmTxquDHNkZHI8ROWJPMH3gMxWo2Nt1QzkoihGsDGwrlmMJ2PTY6HzttzL7kfchYqM495EcUbUm06Y2o1Kx7hfW2IzTigtdPe2ArS2FAbUOhKmyhJQ6oAEgZreQKhv0W+cMoKGjqAMyMgsVyJ5kVB3SLEISVkO+vSN0UOqVfI/wDdNjZt5Yn7ktu+FVGu5W4eHt1V5LcWs1+2anRZMKSnfqXHVpdZkrQFEqALS1jU6ak95xOhDuM8NmYl1tFSlCw4CPACikg7f3AWZ4IuJcxLhsCjqUlJHfMH4G3m2ucyhc9SM3XreseMj6+L4it//WvHr5nDw04NKCnSmVowuuI4tbM3JDzHrNkYLowGzI0F688I1q0o9VbSpyqWc4RtSplQO/wUakp8PztgkALQdgnl5LoRYi/1q76+HEe8nRLg8dqneuR1yOdmSVzlng+ozFOJrY7p6eHTMeIysystmWHGbKPbsuuZWMRLIzEYHVsqdXaFcqCEOICwStLTifhIdKTor9sKJ87RPfifTidSmaOBm8jC4SKT/kSOWlRqRy1psqzHBQMZCJK5Y4l5k+6T8tq+XiLc9dp4AV+7mq9emXnHbLNfG4qerVr0qow4oV6nbLpO9paNe+qm0/XTjIPztDXBhI5mMa2StSCf9XaEdibaFECpeN6HWwvmkEDzTl8Lb5wwubDsR47FLzMYwz0qcS2hqpS23XVk6aJJfp/id/TudfvrwsxrEdUqdl7Q6AgfBylibDkPoiJWep+6a2j3zj8oU7KNnmuuOIpatq85Ltx0F5KSGlMvuFTrIPpuaeUtJHsktn5hxffR9P0TSTNGvttgIV1AyPcZ9a8rTy8cuVCRyxT2Ve0O+o7H6WK3DvYFbLMH8eb2y/XGavY12XDaNSX+4/SpzkYvfZxKTtcH2WCOOCPlcHHN8KMaS4nkoA06bjtboh4p6HVjYWUnwNLMfCb8RnmLw6hMxqu/Zt7NNJCN9WpJZkKA9y5GcbBV9yk/34n8d6JJC+SpoLb/AIqqPJQPzsxQ98Zg2KLwq6jP4EWaPLG5y+LfMHzHRLP/AJbWhTaHT4q6hX6vGqEtXQsDyoCEKBT4jjhSlKSr0Cz8p4nd8/R9LJHAGK9YUVk0QkhOZ3qeQGppy52ZZJeOLj4gM8MBIzJqch9zZj568illZ/cFXrQu9lyO/HWZNIq8ZKeso8naQHWyexSR2W2fKtPY6EJUJ/dm8sXJIsRUKa1yUk6KHI/Q6g97MU1lTMezwnex3B/NRvaDub3k3Y55Rq5KL9qTr0ttolTNetuM5NYU3r2LrSQXWFaeoUkpHstXrx6ckPpBk00QKOhtf7VkA9joexr4C0rmN3I2EUaoxJ5pz8xqPzOxk/hep/mfRfllS63+n6Rzxv8ADbu/1w5cdvDjxCnOop52CYFVw0zsmcofJyx0zdVyL01pz7Ntt3RT1euSM5CjpRr3LTSgHX1aegSkJPutPrwmz/0gyaVoOJ0OL/aggnudB3NfA2Ny67kbFqFEYU81ZDsNT+Z2vFkQyIWVy/8ABZq0bRadkyJKxJrFYlJT1lZk7dC44R2SkDshseVCew1JUo+ZLzXmi53FmKijQDJKRokch9TqT2AqkqlTMAzwmu53J/NBtb//2Q==" },
-  { t: "Власти Ирана передали США семилетний план по разблокировке Ормузского пролива", l: "https://dzen.ru/news/story/a6df4895-6700-5ccc-a616-5fcdc3d262a8", i: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAAAAAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/wAALCAAoACgBAREA/8QAHAABAAEEAwAAAAAAAAAAAAAACAIDBAUGAQcJ/8QALBAAAQMDAgUCBgMAAAAAAAAAAQIDBAAFEQYSBwgTITEiURQyM0FhcZGxs//aAAgBAQAAPwAqyie9Yx8KOcAn9Crba6PUULA99pq5jHPgg/qsrDJ7VKUjzTb5NGGjwMgFbTalfHTO5QCfq0dONOvNaab5hNULsupLpHahXdYYjCQpTASMejpE7Sn8YxSM5pdD6NuHCi86kmWi3wbtCiJfjTWWktOdUkYbJGN4USU7Tnz28UJYreDV5IZ89qZ/J+sNcE4KD9psv/SuiuJOrLBp7mK1FcrhoKz3j4W8KWtx59/qKI2neElZa3jyAUFOQO1bzzMaG1lqDTjesYutJ2o7GyymaLdIYQwY7Sk7uqlLQCFkA98jcBnBPejbGZwMnwPvWrsXae0ABIUsey/V/dPTk2ZZncB7dKfkFt1U2WCEkAfU9jR44z6M11e+PGqYdg0jdLg1JujgYkiKsNLSQAFdQgICfznFJLi5rbRXDbhGu03G9RJ19TZxAjQI8hLi3Huh09xSn5WwcklWOwwMk4rz5flyXxtdfWtIGACe38VQqaXXEjCXFAewJqRkPlO0vOEe281TzXFf/9k=" },
-  { t: "В Ормузском проливе поражен танкер с 15 индийцами на борту", l: "https://dzen.ru/news/story/5d8f2821-d85e-5c1c-99b5-ab1245510041", i: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAQDAwQDAwQEBAQFBQQFBwsHBwYGBw4KCggLEA4RERAOEA8SFBoWEhMYEw8QFh8XGBsbHR0dERYgIh8cIhocHRz/2wBDAQUFBQcGBw0HBw0cEhASHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBz/wAARCAAoACgDASIAAhEBAxEB/8QAGQABAAMBAQAAAAAAAAAAAAAAAAEHCAUJ/8QAMBAAAAUDAQYBDQAAAAAAAAAAAAECBAUDERIxBgcIExQhFRcYIiYyMzZRYXGBldP/xAAZAQEAAwEBAAAAAAAAAAAAAAAAAQIEBQb/xAAgEQACAgEDBQAAAAAAAAAAAAAAAQIDEQQFMRITISJh/9oADAMBAAIRAxEAPwDKYAL13G8NTrfZs9JS9DaKjFpYu+lOmtoqsazwSrK5KK3tWsPe3XQpj12PCMyWeCihA2P5gUjb45a/rVf0FV78uHPyIwkY+d7U0JJ1IuDoUWlNmdJRpSk1LXc1n2L0S01UQz17jp7ZKEJZb+MlxaKMASA2lSLF8h04yflohCqUfKyDOktWSkNnVSklR6XMkmRGfYc0SnsZCGk+QeglWWflwOFIk+d+IeBIX1XPVzsuaXfO+V/rcYIkpiRmFoVIyDx6qnckG6rrqmgj1tkZ2/A1bU317DK4SS2GKb9afB0tei6at70ql8c8MNO972GRT1MczbanHuOSx7PHgvJ8EAADqFCLfYSAAAAAAAAAA//Z" },
-  { t: "Глава JPMorgan Даймон: ВС РФ сегодня могли бы дойти до Парижа", l: "https://dzen.ru/news/story/e8a92f32-b836-5e31-a8f8-ad58cbc32d63", i: "data:image/jpeg;base64,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" },
-  { t: "В Киеве проходит митинг с требованием отставки мэра Кличко", l: "https://dzen.ru/news/story/aafe7f70-10df-5d85-a194-98118f8be1ce", i: "data:image/jpeg;base64,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" },
-  { t: "Украинский беспилотник влетел в квартиру дома в Энергодаре", l: "https://dzen.ru/news/story/b1ae1c5b-04ab-5ea6-9af8-5ec9a15db65a", i: "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAAoACgDASIAAhEBAxEB/8QAGwAAAgIDAQAAAAAAAAAAAAAAAAgCBgEDBQT/xAAwEAABBAECBAIIBwAAAAAAAAACAQMEBQAGEQcTIZESMQgWQVJhcZXTMkJEgZKX0v/EABkBAAMBAQEAAAAAAAAAAAAAAAQFBwIDBv/EACYRAAEDAwMDBQEAAAAAAAAAAAEAAhEDBBIhMUEFE4EGImFxkcH/2gAMAwEAAhEDEQA/AFRFc3ABqm6ASp8s84Ljs02r39KcG664kz7pK6n0hRvBDrpLbCm5JfktGSkQFv0bb7fHLpd9WfYhmDMi4xEx8Dg8lLG08pkpMxbc9wuy5JEVPNFT54zY+k7Ur+n1z9aY+zljCVR8a9DC4+3OkMzJEmujuWYtHMrJzUU5TZtPtgPMZMAITbLdd1TbbD6fqW7tIfdW2LOTlMeI/o/YBz2Wu0a7VKGmGYFcMozHSEHC5oLjgV8ijrtH0N1qSFGerIeh6RHnpGn2rMGfG/LEd0Mk8G5bJ0Rd/bttiegvXHeotIu6q4N11PMrrwqy50fRshMrY7byg5GfkumKoRpt0Nv+XwyFdZrNa2lmYE6/Wkx4lM6Y3VTTiNwU9g6f/ruP/vLTpS2p9VQH10vewzrnhOlhnEqEr/V+XLFQB0ow7i4jypy+ai+IVXZE6kqVVPRjok/Pr/6TH+5neqdP6Z4L6efemlaQa850axmO2psBMsjikrkeLGjtkSonN2I3C2TZFTqnUR6j+nvZja1HOqEiAQPPAMxsBvsQWkrQDwfcNEpdlDkVtnKrpYcuTFeNl0d/wmJKKp3RcMneWTtveT7aQIi9NkuSHEHyQjJSXb91wy221V3bGe/KWka6LgJm0HDRNvEXfDDJnbnVGlbBcP3i75NCVfNVXDDPQ2hXEqYrhhhj+k44rkV//9k=" }
-];
+<script>window.__NEWS__={ "updatedAt": "2026-10-18T18:56:11.705Z", "items": [  {   "title": "Макрон дал поручения правительству после погромов во Франции",   "url": "https://www.rbc.ru/rbcfreenews/6ad50be2ef5f7593f8b47dcf",   "source": "РБК",   "published": 1792349692000  },  {   "title": "«Балтика» — «Ростов»: после первого тайма счёт 0:0",   "url": "https://www.championat.com/football/news-6662836-baltika-rostov-posle-pervogo-tajma-schet-0-0-v-matche-11-go-tura-rpl-2026-2027.html",   "source": "Чемпионат",   "published": 1792349649000  },  {   "title": "В псковской библиотеке расскажут новые данные о Порховской крепости",   "url": "https://www.mk-pskov.ru/culture/2026/10/18/v-pskovskoy-biblioteke-rasskazhut-novye-dannye-o-porkhovskoy-kreposti.html",   "source": "МК",   "published": 1792349640000  },  {   "title": "«Русские не враги французам»: Пушков резко ответил Макрону на фоне беспорядков",   "url": "https://life.ru/p/russkie-ne-vragi-frantsuzam-pushkov-rezko-otvetil-makronu-na-fone-besporyadkov",   "source": "Life",   "published": 1792349637000  },  {   "title": "Вассерман назвал ответ России на массированную атаку Ленобласти",   "url": "https://lenta.ru/news/2026/10/18/vasserman-nazval-otvet-rossii-na-massirovannuyu-ataku-lenoblasti/",   "source": "Лента.ру",   "published": 1792349580000  },  {   "title": "Следком Калмыкии проводит проверку по факту избиения подростка",   "url": "https://www.mk-kalm.ru/social/2026/10/18/sledkom-kalmykii-provodit-proverku-po-faktu-izbieniya-podrostka.html",   "source": "МК",   "published": 1792349552000  },  {   "title": "Латвия заблокировала партию чая из Армении из-за запрещенного пестицида",   "url": "https://tvzvezda.ru/news/202610182148-FMTPZ.html",   "source": "Звезда",   "published": 1792349545000  },  {   "title": "Режим беспилотной опасности ввели в Волгоградской области",   "url": "https://www.m24.ru/news/18102026/954113",   "source": "Москва 24",   "published": 1792349520000  },  {   "title": "Макрон признал, что в протестах участвовали сотни тысяч французов",   "url": "https://ria.ru/20261018/frantsiya-2125293345.html",   "source": "РИА Новости",   "published": 1792349517000  },  {   "title": "США пригрозили ЕС разрушительным ответом на возможные ограничения Starlink",   "url": "https://www.kommersant.ru/doc/9041503",   "source": "Коммерсантъ",   "published": 1792349517000  } ]};</script>
+<script>const NEWS_URL = "data/news.json";
+const REFRESH_MS = 300000;
+const FALLBACK = [
+  { t: "В аэропортах Москвы задержали 103 рейса на вылет и прилёт", l: "https://dzen.ru/news/story/853150c7-d102-57ee-a1c0-325298f9f7c6", s: "Город" },
+  { t: "Свыше 370 рейсов задержаны и отменены в аэропортах Москвы", l: "https://dzen.ru/news/story/e9e8d9e2-b851-5722-a29b-8bdca93a5450", s: "Город" },
+  { t: "Румынские истребители F-16 сбили два беспилотника над Чёрным морем", l: "https://dzen.ru/news/story/f43daee6-0f9e-5f8a-af94-f5852d7d672c", s: "Мир" },
+  { t: "Новак: первый танкер с дизелем РФ отгружен из порта Дикси", l: "https://dzen.ru/news/story/08836f9f-230f-53b8-9b9c-b25bf53a8cb5", s: "Экономика" },
+  { t: "Второй за день нефтяной танкер подорвался на мине в Ормузском проливе", l: "https://dzen.ru/news/story/5c5f75bf-6ae7-5490-887d-00b2df92f0f4", s: "Мир" },
+  { t: "Власти Ирана передали США семилетний план по разблокировке Ормузского пролива", l: "https://dzen.ru/news/story/a6df4895-6700-5ccc-a616-5fcdc3d262a8", s: "Мир" },
+  { t: "В Ормузском проливе поражен танкер с 15 индийцами на борту", l: "https://dzen.ru/news/story/5d8f2821-d85e-5c1c-99b5-ab1245510041", s: "Мир" },
+  { t: "Глава JPMorgan Даймон: ВС РФ сегодня могли бы дойти до Парижа", l: "https://dzen.ru/news/story/e8a92f32-b836-5e31-a8f8-ad58cbc32d63", s: "Мир" },
+  { t: "В Киеве проходит митинг с требованием отставки мэра Кличко", l: "https://dzen.ru/news/story/aafe7f70-10df-5d85-a194-98118f8be1ce", s: "Мир" },
+  { t: "Украинский беспилотник влетел в квартиру дома в Энергодаре", l: "https://dzen.ru/news/story/b1ae1c5b-04ab-5ea6-9af8-5ec9a15db65a", s: "Мир" }
+].map((n) => ({ title: n.t, url: n.l, source: n.s, published: 0 }));
 
 const list = document.getElementById("news");
-const moreBtn = document.getElementById("more");
+const more = document.getElementById("more");
 const empty = document.getElementById("empty");
+const status = document.getElementById("status");
 const input = document.getElementById("searchInput");
 
+let items = [];
 let expanded = false;
+let updatedAt = null;
+
+const COLORS = ["#8a7cf0", "#e0532b", "#2f6bff", "#1c8a8a", "#c81f45", "#a8541b", "#13883f", "#3f4b5b"];
+
+function colorFor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return COLORS[h % COLORS.length];
+}
+
+function initial(name) {
+  const clean = String(name || "?").replace(/\./g, " ").trim();
+  return clean ? clean[0].toUpperCase() : "?";
+}
 
 function itemHTML(n) {
   return (
-    '<li><a class="news__item" href="' + n.l + '" target="_blank" rel="noopener noreferrer">' +
-      '<img class="news__logo" src="' + n.i + '" alt="">' +
-      '<span class="news__title">' + n.t + "</span>" +
+    '<li><a class="news__item" href="' + n.url + '" target="_blank" rel="noopener noreferrer">' +
+      '<span class="news__logo" style="background:' + colorFor(n.source) + '">' + initial(n.source) + "</span>" +
+      '<span class="news__title">' + n.title + "</span>" +
+      '<span class="news__source">' + n.source + "</span>" +
     "</a></li>"
   );
 }
 
 function visible() {
-  return expanded ? NEWS : NEWS.slice(0, 5);
+  return expanded ? items : items.slice(0, 5);
 }
 
 function render() {
   const needle = input.value.trim().toLowerCase();
-  const source = needle ? NEWS.filter((n) => n.t.toLowerCase().includes(needle)) : visible();
+  const source = needle ? items.filter((n) => n.title.toLowerCase().includes(needle)) : visible();
   list.innerHTML = source.map(itemHTML).join("");
   empty.hidden = source.length > 0;
-  moreBtn.hidden = expanded || needle.length > 0;
+  more.hidden = expanded || needle.length > 0 || items.length <= 5;
 }
 
-moreBtn.addEventListener("click", () => {
-  expanded = true;
+function applyItems(rows) {
+  items = rows
+    .filter((n) => n.title && /^https?:\/\//.test(n.url))
+    .map((n) => ({ title: n.title, url: n.url, source: n.source || "Новости", published: n.published || 0 }))
+    .slice(0, 10);
+  expanded = false;
   render();
-});
+}
 
+async function loadNews() {
+  if (location.protocol === "file:") {
+    if (items.length) status.textContent = updatedAt ? "Обновлено в " + new Date(updatedAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }) : "Локальная копия";
+    return;
+  }
+  status.textContent = "Обновляю новости…";
+  try {
+    const res = await fetch(NEWS_URL + "?t=" + Date.now(), { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    if (!data || !Array.isArray(data.items) || data.items.length < 5) throw new Error("мало");
+    applyItems(data.items);
+    updatedAt = data.updatedAt || null;
+    const t = updatedAt ? new Date(updatedAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }) : new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+    status.textContent = "Обновлено в " + t;
+  } catch (e) {
+    if (!items.length) {
+      items = FALLBACK.slice();
+      expanded = false;
+      render();
+      status.textContent = "Нет связи — показана сохранённая подборка";
+    } else {
+      status.textContent = "Не удалось обновить — показаны предыдущие новости";
+    }
+  }
+}
+
+more.addEventListener("click", () => { expanded = true; render(); });
+more.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); expanded = true; render(); } });
 input.addEventListener("input", render);
 document.getElementById("searchForm").addEventListener("submit", (e) => e.preventDefault());
 
-render();</script>
+const bundled = window.__NEWS__;
+if (bundled && Array.isArray(bundled.items) && bundled.items.length >= 5) {
+  applyItems(bundled.items);
+  updatedAt = bundled.updatedAt || null;
+  if (updatedAt) {
+    const bt = new Date(updatedAt).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+    status.textContent = "Обновлено в " + bt;
+  }
+} else {
+  render();
+}
+loadNews();
+setInterval(() => { if (document.visibilityState === "visible") loadNews(); }, REFRESH_MS);</script>
 </body>
 </html>
