@@ -121,7 +121,9 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   border-radius: 8px;
   object-fit: cover;
   background: transparent;
+  transition: filter .2s ease;
 }
+[data-theme="dark"] .logo__mark { filter: invert(1) contrast(1.05); }
 .logo__word {
   font-size: 21px; font-weight: 700; letter-spacing: .02em;
 }
@@ -207,7 +209,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   margin: 0 auto;
   padding: 26px 24px 40px;
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr) 292px;
+  grid-template-columns: 32px minmax(0, 1fr) 292px;
   gap: 24px;
   align-items: start;
 }
@@ -227,7 +229,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 
 .railnav__btn {
   position: relative;
-  width: 44px; height: 44px;
+  width: 32px; height: 44px;
   display: grid; place-items: center;
   border: 0; border-radius: 0;
   background: none; color: var(--ink-2);
@@ -255,46 +257,6 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 .railnav__badge.is-on { display: grid; }
 
 .feed { min-width: 0; }
-
-/* ---------- ticker ---------- */
-
-.ticker {
-  display: flex; align-items: center; gap: 14px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 9px 14px;
-  margin-bottom: 20px;
-  font-size: 13.5px;
-  color: var(--ink-2);
-  overflow: hidden;
-}
-.ticker__label {
-  flex: none;
-  display: inline-flex; align-items: center; gap: 7px;
-  font-weight: 650; font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
-  color: var(--like);
-}
-.ticker__pulse {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: currentColor;
-  box-shadow: 0 0 0 0 currentColor;
-  animation: pulse 2.4s ease-out infinite;
-}
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(224, 48, 107, .5); }
-  70% { box-shadow: 0 0 0 7px rgba(224, 48, 107, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(224, 48, 107, 0); }
-}
-.ticker__viewport { position: relative; flex: 1; height: 20px; overflow: hidden; }
-.ticker__item {
-  position: absolute; inset: 0;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  opacity: 0; transform: translateY(8px);
-  transition: opacity .35s ease, transform .35s ease;
-  line-height: 20px;
-}
-.ticker__item.is-on { opacity: 1; transform: none; }
 
 /* ---------- feed head ---------- */
 
@@ -645,7 +607,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 /* ---------- responsive ---------- */
 
 @media (max-width: 1180px) {
-  .layout { grid-template-columns: 64px minmax(0, 1fr); }
+  .layout { grid-template-columns: 32px minmax(0, 1fr); }
   .rail { display: none; }
 }
 
@@ -661,7 +623,6 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   .card--hero .card__inner { padding: 18px 18px 16px; }
   .card--hero .card__title { font-size: 20px; }
   .feed__head h1 { font-size: 23px; }
-  .ticker { font-size: 12.5px; }
   .foot { padding: 0 16px 34px; }
   .reader { padding: 12px; }
   .reader__body { padding: 16px 18px 26px; }
@@ -752,17 +713,6 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   </aside>
 
   <section class="feed" id="feed">
-    <div class="ticker" id="ticker" aria-label="Последние заголовки">
-      <span class="ticker__label">
-        <span class="ticker__pulse" aria-hidden="true"></span>
-        Сейчас
-      </span>
-      <span class="ticker__viewport">
-        <span class="ticker__item is-on" id="tickA"></span>
-        <span class="ticker__item" id="tickB"></span>
-      </span>
-    </div>
-
     <div class="feed__head">
       <h1 id="feedTitle">Главное</h1>
       <span class="feed__count" id="feedCount"></span>
@@ -1111,8 +1061,6 @@ const els = {
   savedCount: $("#savedCount"),
   trends: $("#trends"),
   channels: $("#channels"),
-  tickA: $("#tickA"),
-  tickB: $("#tickB"),
   reader: $("#reader"),
   readerBody: $("#readerBody"),
   themeBtn: $("#themeToggle"),
@@ -1435,25 +1383,6 @@ function initTheme() {
   els.themeBtn.setAttribute("aria-label", els.themeLabel.textContent);
 }
 
-function initTicker() {
-  let i = 0;
-  let showA = true;
-  const title = (k) => (state.articles[k] ? state.articles[k].title : "");
-  els.tickA.textContent = title(0);
-  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
-  setInterval(() => {
-    const total = Math.min(state.articles.length, 6);
-    if (reduce.matches || total < 2) return;
-    i = (i + 1) % total;
-    const showEl = showA ? els.tickB : els.tickA;
-    const hideEl = showA ? els.tickA : els.tickB;
-    showEl.textContent = title(i);
-    hideEl.classList.remove("is-on");
-    showEl.classList.add("is-on");
-    showA = !showA;
-  }, 5200);
-}
-
 const NEWS_URL = "data/news.json";
 const NEWS_KEY = "shum.news.v3";
 const REFRESH_MS = 600000;
@@ -1558,7 +1487,6 @@ if (newsCache && Array.isArray(newsCache.articles) && newsCache.articles.length)
 buildTrends();
 buildChannels();
 initTheme();
-initTicker();
 if (state.articles.length) render();
 else renderSkeleton();
 
