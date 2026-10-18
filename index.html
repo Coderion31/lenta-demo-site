@@ -1454,16 +1454,16 @@ function initTicker() {
   }, 5200);
 }
 
-const FEEDS = [
-  { url: "https://www.gazeta.ru/export/rss/politics.xml", cat: "Политика" },
-  { url: "https://www.gazeta.ru/export/rss/social.xml", cat: "Общество" },
-  { url: "https://www.gazeta.ru/export/rss/sport.xml", cat: "Спорт" },
-  { url: "https://www.gazeta.ru/export/rss/culture.xml", cat: "Культура" },
-  { url: "https://www.gazeta.ru/export/rss/science.xml", cat: "Наука" },
-  { url: "https://www.gazeta.ru/export/rss/auto.xml", cat: "Авто" }
-];
-const NEWS_KEY = "shum.news.v2";
+const NEWS_URL = "data/news.json";
+const NEWS_KEY = "shum.news.v3";
 const REFRESH_MS = 600000;
+const SOURCE_COLORS = ["#2f6bff", "#8a3fb5", "#0f7f9c", "#c81f45", "#e0532b", "#13883f", "#3f4b5b", "#a8541b"];
+
+function colorFor(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) >>> 0;
+  return SOURCE_COLORS[h % SOURCE_COLORS.length];
+}
 
 function stripHtml(s) {
   return String(s || "").replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
@@ -1491,52 +1491,26 @@ function relTime(date) {
   return date.toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 }
 
-function feedItem(node, feed) {
-  const get = (tag) => { const el = node.getElementsByTagName(tag)[0]; return el ? el.textContent : ""; };
-  const title = stripHtml(get("title"));
-  const link = (get("link") || "").trim();
-  const desc = stripHtml(get("description"));
-  const date = new Date(get("pubDate"));
-  if (!title || !/^https?:\/\//.test(link)) return null;
+function mapItem(it) {
+  const date = new Date(it.published);
+  const source = it.source || "Источник";
   return {
-    id: "g" + hashStr(link),
-    cat: feed.cat,
-    channel: "Газета.Ru",
-    color: "#13883f",
+    id: "n" + hashStr(String(it.url || it.title)),
+    cat: it.topic || "Новости",
+    channel: source,
+    color: colorFor(source),
     time: isNaN(date) ? "" : relTime(date),
-    title: title,
-    excerpt: shortText(desc, 190),
+    title: stripHtml(it.title),
+    excerpt: shortText(it.excerpt, 200),
     cover: "",
-    tag: feed.cat,
+    tag: it.topic || "",
     likes: 0,
     comments: null,
-    tags: [feed.cat.toLowerCase()],
-    url: link,
-    body: desc ? [shortText(desc, 420)] : [],
+    tags: [String(it.topic || "").toLowerCase()],
+    url: it.url,
+    body: it.excerpt ? [shortText(it.excerpt, 420)] : [],
     published: isNaN(date) ? 0 : date.getTime()
   };
-}
-
-async function fetchFeed(feed) {
-  const ctrl = new AbortController();
-  const timer = setTimeout(() => ctrl.abort(), 8000);
-  try {
-    const res = await fetch(feed.url, { mode: "cors", cache: "no-store", signal: ctrl.signal });
-    if (!res.ok) throw new Error("HTTP " + res.status);
-    const buf = await res.arrayBuffer();
-    const ctype = res.headers.get("content-type") || "";
-    const m = /charset=([^;]+)/i.exec(ctype);
-    let charset = m ? m[1].trim().toLowerCase() : "utf-8";
-    if (charset === "cp1251" || charset === "windows-1251") charset = "windows-1251";
-    let xml;
-    try { xml = new TextDecoder(charset).decode(buf); }
-    catch (e) { xml = new TextDecoder("utf-8").decode(buf); }
-    xml = xml.replace(/^\uFEFF/, "").replace(/<\?xml[^>]*\?>/, "");
-    const doc = new DOMParser().parseFromString(xml, "application/xml");
-    return Array.from(doc.getElementsByTagName("item")).map((n) => feedItem(n, feed)).filter(Boolean);
-  } finally {
-    clearTimeout(timer);
-  }
 }
 
 function setFeedStatus(text, kind) {
@@ -1548,51 +1522,34 @@ function setFeedStatus(text, kind) {
 async function loadNews() {
   if (els.refreshNews) els.refreshNews.disabled = true;
   setFeedStatus("Обновляю ленту…", "loading");
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 12000);
   try {
-    const results = await Promise.allSettled(FEEDS.map(fetchFeed));
-    const got = [];
-    const seen = new Set();
-    results.forEach((r) => {
-      if (r.status !== "fulfilled") return;
-      r.value.forEach((a) => { if (!seen.has(a.id)) { seen.add(a.id); got.push(a); } });
-    });
-    if (got.length < 5) throw new Error("мало материалов");
-    got.sort((a, b) => b.published - a.published);
-    state.articles = got.slice(0, 18);
+    const res = await fetch(NEWS_URL + "?t=" + Date.now(), { cache: "no-store", signal: ctrl.signal });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const data = await res.json();
+    const items = (data.items || []).map(mapItem).filter((a) => a.title && /^https?:\/\//.test(a.url));
+    if (items.length < 5) throw new Error("мало материалов");
+    items.sort((a, b) => b.published - a.published);
+    state.articles = items.slice(0, 60);
     state.shown = PAGE;
     store(NEWS_KEY, { ts: Date.now(), articles: state.articles });
     render();
     const t = new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
-    setFeedStatus("Обновлено в " + t + " · Газета.Ru", "live");
+    const srcCount = new Set(items.map((a) => a.channel)).size;
+    setFeedStatus("Обновлено в " + t + " · " + srcCount + " " + plural(srcCount, "источник", "источника", "источников"), "live");
   } catch (e) {
     if (!state.articles.length) {
       state.articles = ARTICLES.slice();
       state.shown = PAGE;
       render();
     }
-    setFeedStatus("Нет связи с источниками — офлайн-подборка за 17 октября", "offline");
+    setFeedStatus("Нет связи с лентой — показана офлайн-подборка", "offline");
   } finally {
+    clearTimeout(timer);
     if (els.refreshNews) els.refreshNews.disabled = false;
   }
 }
-
-function renderSkeleton() {
-  const row = (w) => '<span class="skel__line' + (w ? " skel__line--" + w : "") + '"></span>';
-  els.grid.innerHTML = Array.from({ length: 6 }).map(() => (
-    '<article class="card card--note skel" aria-hidden="true">' +
-      '<div class="card__inner">' +
-        row("xs") +
-        row("lg") +
-        row("") +
-        row("md") +
-      "</div>" +
-    "</article>"
-  )).join("");
-  els.count.textContent = "Загружаю…";
-  els.empty.hidden = true;
-  els.more.hidden = true;
-}
-
 const newsCache = load(NEWS_KEY, null);
 if (newsCache && Array.isArray(newsCache.articles) && newsCache.articles.length) {
   state.articles = newsCache.articles;
