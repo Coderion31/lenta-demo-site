@@ -297,41 +297,43 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
+  gap: 2px;
+  max-width: 560px;
   }
 
   /* компактные строки новостей */
   .newsrow {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
+  background: none;
+  border: 0;
+  border-radius: 0;
   overflow: hidden;
   }
   .newsrow__link {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
+  gap: 9px;
+  padding: 5px 6px;
+  border-radius: 8px;
   text-decoration: none;
   transition: background .15s ease;
   }
-  .newsrow__link:hover { background: var(--surface-2); }
+  .newsrow__link:hover { background: var(--surface); }
   .newsrow__logo {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   color: #fff;
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
   flex: none;
   user-select: none;
   }
   .newsrow__title {
-  font-size: 15px;
-  font-weight: 550;
-  line-height: 1.35;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.3;
   letter-spacing: -.01em;
   }
   
