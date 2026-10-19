@@ -222,15 +222,17 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   padding: 8px 24px 40px;
   border-left: 1px solid var(--line);
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) 292px;
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
   align-items: start;
   }
 
 .railnav-wrap {
-  position: sticky;
+  position: fixed;
+  left: 24px;
   top: calc(var(--header-h) + 8px);
-}
+  z-index: 20;
+  }
 
 .railnav {
   display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
@@ -272,7 +274,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 }
 .railnav__badge.is-on { display: grid; }
 
-.feed { min-width: 0; max-width: 860px; width: 100%; justify-self: center; }
+.feed { min-width: 0; width: 100%; justify-self: center; }
 
 /* ---------- feed head ---------- */
 
@@ -524,7 +526,8 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 .more {
   display: block;
   width: 100%;
-  margin: 18px 0 0;
+  max-width: 560px;
+  margin: 18px auto 0;
   border: 0;
   background: none;
   color: var(--muted);
@@ -539,7 +542,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 
 /* ---------- right rail ---------- */
 
-.rail { display: flex; flex-direction: column; gap: 18px; position: sticky; top: calc(var(--header-h) + 26px); }
+.rail { display: flex; flex-direction: column; gap: 18px; position: fixed; right: 24px; top: calc(var(--header-h) + 26px); width: 292px; z-index: 20; }
 
 .panel {
   background: var(--surface);
