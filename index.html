@@ -798,15 +798,6 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   </aside>
 
   <section class="feed" id="feed">
-    <div class="feed__head">
-      <h1 id="feedTitle">Главное</h1>
-      <span class="feed__count" id="feedCount"></span>
-      <div class="feed__tools">
-        <span class="feed__status" id="feedStatus">Загружаю новости…</span>
-        <button class="feed__refresh" id="refreshNews" type="button" aria-label="Обновить новости">Обновить</button>
-      </div>
-    </div>
-
     <div class="grid" id="grid" aria-live="polite"></div>
 
     <div class="empty" id="empty" hidden>
@@ -1302,14 +1293,16 @@ function render() {
   const visible = list.slice(0, state.shown);
 
   els.grid.innerHTML = visible.map(cardHTML).join("");
-  els.title.textContent = viewTitle();
+  if (els.title) els.title.textContent = viewTitle();
 
-  if (state.view === "drafts") {
-    els.count.textContent = "0 публикаций";
-  } else if (state.q) {
-    els.count.textContent = "«" + state.q + "» · " + pubCount(list.length);
-  } else {
-    els.count.textContent = pubCount(list.length);
+  if (els.count) {
+    if (state.view === "drafts") {
+      els.count.textContent = "0 публикаций";
+    } else if (state.q) {
+      els.count.textContent = "«" + state.q + "» · " + pubCount(list.length);
+    } else {
+      els.count.textContent = pubCount(list.length);
+    }
   }
 
   els.more.hidden = state.view === "drafts" || list.length <= state.shown;
@@ -1619,7 +1612,7 @@ function renderSkeleton() {
       "</div>" +
     "</article>"
   )).join("");
-  els.count.textContent = "Загружаю…";
+  if (els.count) els.count.textContent = "Загружаю…";
   els.empty.hidden = true;
   els.more.hidden = true;
 }
