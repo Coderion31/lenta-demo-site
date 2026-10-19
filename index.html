@@ -296,11 +296,46 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  }
 
-.card {
+  /* компактные строки новостей */
+  .newsrow {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  }
+  .newsrow__link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  text-decoration: none;
+  transition: background .15s ease;
+  }
+  .newsrow__link:hover { background: var(--surface-2); }
+  .newsrow__logo {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex: none;
+  user-select: none;
+  }
+  .newsrow__title {
+  font-size: 15px;
+  font-weight: 550;
+  line-height: 1.35;
+  letter-spacing: -.01em;
+  }
+  
+  .card {
   position: relative;
   display: flex; flex-direction: column;
   background: var(--surface);
@@ -1209,32 +1244,22 @@ function titleHTML(a) {
   );
 }
 
+function miniLogo(a) {
+  const colors = ["#8a7cf0", "#e0532b", "#2f6bff", "#1c8a8a", "#c81f45", "#a8541b", "#13883f", "#3f4b5b"];
+  let h = 0;
+  for (let i = 0; i < a.channel.length; i++) h = (h * 31 + a.channel.charCodeAt(i)) >>> 0;
+  const bg = colors[h % colors.length];
+  const ch = a.channel.replace(/\./g, " ").trim().charAt(0).toUpperCase() || "?";
+  return '<span class="newsrow__logo" style="background:' + bg + '">' + ch + "</span>";
+}
+
 function cardHTML(a, index) {
-  if (a.cover) {
-    const isHero = index === 0;
-    const cover = '<div class="card__cover"><img src="' + a.cover + '" alt="" decoding="async"></div>';
-    const inner =
-      '<div class="card__inner">' +
-        metaHTML(a) +
-        titleHTML(a) +
-        '<p class="card__text">' + a.excerpt + "</p>" +
-        footHTML(a) +
-      "</div>";
-    return (
-      '<article class="card ' + (isHero ? "card--hero" : "card--photo") + '" data-card="' + a.id + '">' +
-        (isHero ? '<div class="card__body">' + cover + inner + "</div>" : cover + inner) +
-      "</article>"
-    );
-  }
-  const tinted = index % 5 === 3 ? " is-tinted" : "";
   return (
-    '<article class="card card--note' + tinted + '" data-card="' + a.id + '">' +
-      '<div class="card__inner">' +
-        metaHTML(a) +
-        titleHTML(a) +
-        '<p class="card__text">' + a.excerpt + "</p>" +
-        footHTML(a) +
-      "</div>" +
+    '<article class="newsrow" data-card="' + a.id + '">' +
+      '<a class="newsrow__link" href="#" data-open="' + a.id + '" aria-label="Читать: ' + a.title.replace(/"/g, "&quot;") + '">' +
+        miniLogo(a) +
+        '<span class="newsrow__title">' + a.title + "</span>" +
+      "</a>" +
     "</article>"
   );
 }
@@ -1443,7 +1468,7 @@ function initTheme() {
 
 const NEWS_URL = "data/news.json";
 const NEWS_KEY = "shum.news.v3";
-const REFRESH_MS = 600000;
+const REFRESH_MS = 300000;
 const SOURCE_COLORS = ["#2f6bff", "#8a3fb5", "#0f7f9c", "#c81f45", "#e0532b", "#13883f", "#3f4b5b", "#a8541b"];
 
 function colorFor(name) {
