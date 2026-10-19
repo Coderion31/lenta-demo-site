@@ -142,9 +142,9 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 .search {
   position: relative;
   flex: 1 1 auto;
-  max-width: 620px;
+  max-width: 560px;
   margin: 0 auto;
-}
+  }
 .search__icon {
   position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
   width: 23px; height: 23px; color: var(--muted); stroke-width: 2.1; pointer-events: none;
@@ -311,6 +311,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   grid-template-columns: minmax(0, 1fr);
   gap: 2px;
   max-width: 560px;
+  margin: 0 auto;
   }
 
   /* компактные строки новостей */
@@ -523,17 +524,17 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 .more {
   display: block;
   width: 100%;
-  margin: 20px 0 0;
-  height: 48px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--surface);
-  color: var(--ink);
-  font-size: 14.5px; font-weight: 600;
+  margin: 18px 0 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  font-size: 14px; font-weight: 500;
+  text-align: center;
   cursor: pointer;
-  transition: background .15s ease, border-color .15s ease;
+  padding: 8px 0;
+  transition: color .15s ease;
 }
-.more:hover { background: var(--surface-2); border-color: var(--line-strong); }
+.more:hover { color: var(--accent); }
 .more[hidden] { display: none; }
 
 /* ---------- right rail ---------- */
