@@ -105,10 +105,10 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   height: var(--header-h);
   padding: 0 24px;
   border-left: 1px solid var(--line);
-  display: flex;
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) 292px;
+  gap: 24px;
   align-items: center;
-  justify-content: center;
-  gap: 20px;
   }
 
   .logo {
@@ -222,16 +222,14 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   padding: 8px 24px 40px;
   border-left: 1px solid var(--line);
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: 28px minmax(0, 1fr) 292px;
   gap: 24px;
   align-items: start;
   }
 
 .railnav-wrap {
-  position: fixed;
-  left: 24px;
+  position: sticky;
   top: calc(var(--header-h) + 8px);
-  z-index: 20;
   }
 
 .railnav {
@@ -274,7 +272,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 }
 .railnav__badge.is-on { display: grid; }
 
-.feed { min-width: 0; width: 100%; justify-self: center; }
+.feed { min-width: 0; max-width: 860px; width: 100%; justify-self: center; }
 
 /* ---------- feed head ---------- */
 
@@ -542,7 +540,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 
 /* ---------- right rail ---------- */
 
-.rail { display: flex; flex-direction: column; gap: 18px; position: fixed; right: 24px; top: calc(var(--header-h) + 26px); width: 292px; z-index: 20; }
+.rail { display: flex; flex-direction: column; gap: 18px; position: sticky; top: calc(var(--header-h) + 26px); }
 
 .panel {
   background: var(--surface);
@@ -682,6 +680,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
 
 @media (max-width: 1180px) {
   .layout { grid-template-columns: 28px minmax(0, 1fr); }
+  .topbar__inner { grid-template-columns: 28px minmax(0, 1fr); }
   .rail { display: none; }
 }
 
@@ -691,7 +690,7 @@ svg.ico-fill { fill: currentColor; stroke: none; }
   .topbar__inner, .layout { border-left: 0; }
   .feed { max-width: none; justify-self: auto; }
   .railnav-wrap { display: none; }
-  .topbar__inner { padding: 0 16px; gap: 12px; position: relative; }
+  .topbar__inner { padding: 0 16px; gap: 12px; position: relative; display: flex; justify-content: flex-start; }
   .search-toggle { display: grid; }
   .search { display: none; }
   .search.is-open {
